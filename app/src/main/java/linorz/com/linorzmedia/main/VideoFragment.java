@@ -43,21 +43,26 @@ public class VideoFragment extends MediaFragment {
 
     @Override
     protected void load() {
-        int ii;
-        if (num + 20 < videos.size()) ii = 20;
-        else {
-            ii = videos.size() % 20;
-            isEnd = true;
-        }
-        for (int i = num; i < num + ii; i++) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("img", StaticMethod.createVideoThumbnail(videos.get(i).getPath()));
-            map.put("name", videos.get(i).getTitle());
-            map.put("time", StaticMethod.getMusicTime(videos.get(i).getDuration()));
-            map.put("path", "file://" + videos.get(i).getPath());
-            items.add(map);
-        }
-        recyclerView.notifyMoreFinish(true);
-        num = num + 20;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int ii;
+                if (num + 20 < videos.size()) ii = 20;
+                else {
+                    ii = videos.size() % 20;
+                    isEnd = true;
+                }
+                for (int i = num; i < num + ii; i++) {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("img", StaticMethod.createVideoThumbnail(videos.get(i).getPath()));
+                    map.put("name", videos.get(i).getTitle());
+                    map.put("time", StaticMethod.getMusicTime(videos.get(i).getDuration()));
+                    map.put("path", "file://" + videos.get(i).getPath());
+                    items.add(map);
+                }
+                recyclerView.notifyMoreFinish(true);
+                num = num + 20;
+            }
+        }).start();
     }
 }
