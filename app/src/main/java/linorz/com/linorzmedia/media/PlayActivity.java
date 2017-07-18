@@ -17,6 +17,8 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -111,7 +113,14 @@ public class PlayActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // 隐藏标题栏
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        // 隐藏状态栏
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        StaticMethod.hideBottomUIMenu(this);
         setContentView(R.layout.play_activity);
+
         seekBar = (SeekBar) findViewById(R.id.seekbar);
         currentTime_tv = (TextView) findViewById(R.id.currenttime);
         time_tv = (TextView) findViewById(R.id.time);
@@ -201,7 +210,7 @@ public class PlayActivity extends Activity {
             dealPath(type, path);
         } else {
             Uri uri = intent.getData();
-            String realPath = StaticMethod.getRealPath(this,uri);
+            String realPath = StaticMethod.getRealPath(this, uri);
             int start = realPath.lastIndexOf("/");
             int end = realPath.lastIndexOf(".");
             if (start != -1 && end != -1) title_tv.setText(realPath.substring(start + 1, end));
