@@ -22,9 +22,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -167,28 +169,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initFab() {
-        int px = StaticMethod.dipTopx(this, 50);
-        int px2 = StaticMethod.dipTopx(this, 60);
-        LinearLayout.LayoutParams vl = new LinearLayout.LayoutParams(px, px);
+        FrameLayout frame = (FrameLayout) findViewById(R.id.fram);
 
-        RandomFloatView rfv = new RandomFloatView(this, px2, px2);
+        final RandomFloatView rfv = new RandomFloatView(this, 60, 60);
         rfv.setImageResource(R.drawable.current);
         rfv.setBackgroundResource(R.drawable.blue_circle);
-        rfv.initView((FrameLayout) findViewById(R.id.fram), 0, 0);
+        rfv.initView(frame, 1, 0.2);
 
-        ImageView[] btns = new ImageView[6];
-        for (int i = 0; i < btns.length; i++) {
-            btns[i] = new ImageView(this);
-            btns[i].setBackgroundResource(R.drawable.blue_circle);
-            btns[i].setLayoutParams(vl);
-        }
-        btns[0].setImageResource(R.drawable.next);
-        btns[1].setImageResource(R.drawable.voice_up_white);
-        btns[2].setImageResource(R.drawable.back_top);
-        btns[3].setImageResource(R.drawable.voice_down_white);
-        btns[4].setImageResource(R.drawable.pre);
-        btns[5].setImageResource(R.drawable.btn_play_white);
-        FloatingActionMenu centerBottomMenu = new FloatingActionMenu.Builder(this)
+        ImageView[] btns = getSubButton(frame);
+
+        final FloatingActionMenu centerBottomMenu = new FloatingActionMenu.Builder(this)
                 .setStartAngle(-30)
                 .setAnimationHandler(new DefaultAnimationHandler())
                 .addSubActionView(btns[0])
@@ -198,8 +188,33 @@ public class MainActivity extends AppCompatActivity {
                 .addSubActionView(btns[4])
                 .addSubActionView(btns[5])
                 .attachTo(rfv).build();
+
+        rfv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (rfv.canDo())
+                    centerBottomMenu.toggle(true);
+                else if (centerBottomMenu.isOpen())
+                    centerBottomMenu.close(true);
+            }
+        });
+
         initBtnListener(btns);
         play_btn = btns[5];
+    }
+
+    private ImageView[] getSubButton(ViewGroup parentView) {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        ImageView[] btns = new ImageView[6];
+        for (int i = 0; i < btns.length; i++)
+            btns[i] = (ImageView) inflater.inflate(R.layout.sub_btn, parentView, false).findViewById(R.id.sub_image);
+        btns[0].setImageResource(R.drawable.next);
+        btns[1].setImageResource(R.drawable.voice_up_white);
+        btns[2].setImageResource(R.drawable.back_top);
+        btns[3].setImageResource(R.drawable.voice_down_white);
+        btns[4].setImageResource(R.drawable.pre);
+        btns[5].setImageResource(R.drawable.btn_play_white);
+        return btns;
     }
 
     private void initBtnListener(final ImageView[] btns) {

@@ -14,8 +14,10 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import linorz.com.linorzmedia.tools.StaticMethod;
+
 //可以拖动的按钮
-public class RandomFloatView extends ImageView {
+public class RandomFloatView extends android.support.v7.widget.AppCompatImageView {
     private int HANDLER_INT = 0;
     private int basex = 0, basey = 0;
     private int lastx = 0, lasty = 0;
@@ -30,22 +32,22 @@ public class RandomFloatView extends ImageView {
 
     public RandomFloatView(Context context, int width, int height) {
         super(context);
-        setLayoutParams(new LayoutParams(width, height));
-        this.width = width;
-        this.height = height;
+        this.width = dipTopx(context, width);
+        this.height = dipTopx(context, height);
+        setLayoutParams(new LayoutParams(this.width, this.height));
         screenWidth = ((Activity) context).getWindowManager().getDefaultDisplay().getWidth();
         screenHeight = ((Activity) context).getWindowManager().getDefaultDisplay().getHeight();
     }
 
-    public void initView(FrameLayout layout, int startx, int starty) {
+    public void initView(FrameLayout layout, double startx, double starty) {
         layout.addView(this);
-        basex = startx;
-        basey = starty;
+        basex = (int) (screenWidth * startx) - width/2;
+        basey = (int) (screenHeight * starty);
         round = 0;
         enable_touch = true;
         // 此句必须在最后初始化（否则需要很多判断它是否为null）
         param = (FrameLayout.LayoutParams) getLayoutParams();
-        moveToHere(startx, starty);
+        moveToHere(basex, basey);
     }
 
     public void startRandomMove(int round_limit, int start_dir) {
@@ -109,12 +111,15 @@ public class RandomFloatView extends ImageView {
         moveToHere(movex, movey);
     }
 
+    int nowx;
+    int nowy;
+
     @Override
     public boolean onTouchEvent(MotionEvent e1) {
         if (!enable_touch)
             return super.onTouchEvent(e1);
-        final int nowx = (int) e1.getRawX();
-        final int nowy = (int) e1.getRawY();
+        nowx = (int) e1.getRawX();
+        nowy = (int) e1.getRawY();
         switch (e1.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 is_moved = false;
@@ -132,16 +137,19 @@ public class RandomFloatView extends ImageView {
                 new Handler().postDelayed(new Runnable() {
                     public void run() {
                         if (is_moved) {// 位置回归
-                            int back_x = param.leftMargin + (nowx - lastx),
-                                    back_y = param.topMargin + (nowy - lasty);
-                            if (nowx - width < 0) back_x = 0;
-                            if (screenWidth - nowx - width < 0) back_x = screenWidth - width;
+                            //记录当前位置
+                            int old_x = param.leftMargin + (nowx - lastx),
+                                    old_y = param.topMargin + (nowy - lasty);
+                            int back_x = old_x, back_y = old_y;
+                            //判断水平
+                            if (nowx - width < 0) back_x = -width / 2;
+                            if (screenWidth - nowx - width < 0) back_x = screenWidth - width / 2;
+                            //判断垂直
                             if (param.topMargin < 0) back_y = 0;
                             if (screenHeight - 4 * height - param.topMargin < 0)
                                 back_y = screenHeight - 4 * height;
-
-                            if (back_x != param.leftMargin + (nowx - lastx) ||
-                                    back_y != param.topMargin + (nowy - lasty))
+                            //边缘停靠
+                            if (back_x != old_x || back_y != old_y)
                                 returnToScreen(back_x, back_y);
                             is_moved = false;
                         }
@@ -150,6 +158,14 @@ public class RandomFloatView extends ImageView {
                 break;
         }
         return super.onTouchEvent(e1);
+    }
+
+    public boolean canDo() {
+        if (nowx - width < 0) return false;
+        if (screenWidth - nowx - width < 0) return false;
+        if (param.topMargin < 0) return false;
+        if (screenHeight - 4 * height - param.topMargin < 0) return false;
+        return true;
     }
 
     @Override
@@ -196,5 +212,10 @@ public class RandomFloatView extends ImageView {
         param.topMargin = tempy;
         setLayoutParams(param);
         invalidate();
+    }
+
+    private int dipTopx(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
     }
 }
