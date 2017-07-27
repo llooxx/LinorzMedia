@@ -48,6 +48,7 @@ import linorz.com.linorzmedia.customview.MyPageTransformer;
 import linorz.com.linorzmedia.customview.RandomFloatView;
 import linorz.com.linorzmedia.media.PlayActivity;
 import linorz.com.linorzmedia.mediatools.Audio;
+import linorz.com.linorzmedia.mediatools.Video;
 import linorz.com.linorzmedia.tools.StaticMethod;
 
 public class MainActivity extends AppCompatActivity {
@@ -55,6 +56,9 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager viewPager;
     private List<MediaFragment> list;
     private MediaPlayer main_player;
+    private VideoFragment videoFragment;
+    private AudioFragment audioFragment;
+    private ImageFragment imageFragment;
     private TextView audio_title, audio_author, audio_state;
     private ImageView play_btn;
     private SeekBar audio_seekbar;
@@ -87,12 +91,12 @@ public class MainActivity extends AppCompatActivity {
         editor = mySharedPreferences.edit();
         initImageLoader(this);
         initView();
-        initFab();
         new Handler().postDelayed(new Runnable() {
             public void run() {
+                initFab();//开线程时，已经绘制完成，能获得view的宽高
                 String path = mySharedPreferences.getString("lastAudioPath", null);
                 if (path == null) {
-                    Audio first_audio = ((AudioFragment) list.get(1)).getAudio(current_audio_num);
+                    Audio first_audio = audioFragment.getAudio(current_audio_num);
                     setAudio(first_audio, false);
                 } else {
                     Audio first_audio = new Audio();
@@ -105,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }, 1000);
 
+        viewPager.setCurrentItem(1);
         //启动悬浮窗
 //        Intent intent = new Intent(MainActivity.this, LinorzService.class);
 //        startService(intent);
@@ -123,9 +128,12 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setOffscreenPageLimit(2);
         list = new ArrayList<>();
         List<String> list_title = new ArrayList<>();
-        list.add(new VideoFragment());
-        list.add(new AudioFragment());
-        list.add(new ImageFragment());
+        videoFragment = new VideoFragment();
+        audioFragment = new AudioFragment();
+        imageFragment = new ImageFragment();
+        list.add(videoFragment);
+        list.add(audioFragment);
+        list.add(imageFragment);
 
         list_title.add("video");
         list_title.add("audio");
@@ -136,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setTabMode(TabLayout.MODE_FIXED);
         tabLayout.setupWithViewPager(viewPager);
 
-        ((VideoFragment) list.get(0)).setPlayAudioListener(new PlayAudio() {
+        videoFragment.setPlayAudioListener(new PlayAudio() {
             @Override
             public void playAudio(int i) {
                 if (main_player != null && main_player.isPlaying()) startOrPause(false);
@@ -147,11 +155,11 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        ((AudioFragment) list.get(1)).setPlayAudioListener(new PlayAudio() {
+        audioFragment.setPlayAudioListener(new PlayAudio() {
             @Override
             public void playAudio(int i) {
                 if (i == current_audio_num) return;
-                Audio audio = ((AudioFragment) list.get(1)).getAudio(i);
+                Audio audio = audioFragment.getAudio(i);
                 setAudio(audio, true);
                 current_audio_num = i;
             }
@@ -159,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void playAudioTwo(int i) {
                 if (main_player != null && main_player.isPlaying()) startOrPause(false);
-                Audio audio = ((AudioFragment) list.get(1)).getAudio(i);
+                Audio audio = audioFragment.getAudio(i);
                 StaticMethod.currentDuration = -1;
                 Intent intent = new Intent(MainActivity.this, PlayActivity.class);
                 intent.putExtra("path", "file://" + audio.getPath());
@@ -172,16 +180,16 @@ public class MainActivity extends AppCompatActivity {
     private void initFab() {
         FrameLayout frame = (FrameLayout) findViewById(R.id.fram);
 
-        final RandomFloatView rfv = new RandomFloatView(this, 60, 60);
+        final RandomFloatView rfv = new RandomFloatView(frame.getContext(), 60, 60);
         rfv.setImageResource(R.drawable.current);
         rfv.setBackgroundResource(R.drawable.blue_circle);
-        rfv.initView(frame, 1, 0.2);
+        rfv.initView(frame, 1, 0.5);
 
         ImageView[] btns = getSubButton(frame);
-
         final FloatingActionMenu centerBottomMenu = new FloatingActionMenu.Builder(this)
                 .setStartAngle(-30)
-                .setAnimationHandler(new DefaultAnimationHandler())
+                .setAnimationHandler(new DefaultAnimationHandler()
+                        .setDuration(100).setBetweenTime(10))
                 .addSubActionView(btns[0])
                 .addSubActionView(btns[1])
                 .addSubActionView(btns[2])
@@ -190,16 +198,26 @@ public class MainActivity extends AppCompatActivity {
                 .addSubActionView(btns[5])
                 .attachTo(rfv).build();
 
-        rfv.setOnClickListener(new View.OnClickListener() {
+        rfv.setOnClickListener(null);
+        rfv.setAction(new RandomFloatView.Action() {
+            long time = 0, last_time = 0;
+
             @Override
-            public void onClick(View view) {
-                if (rfv.canDo())
-                    centerBottomMenu.toggle(true);
-                else if (centerBottomMenu.isOpen())
+            public void up() {
+                time = System.currentTimeMillis();
+                if ((time - last_time) < 1000 && rfv.canDo() && !centerBottomMenu.isOpen())
+                    centerBottomMenu.open(true);
+                last_time = time;
+            }
+
+            @Override
+            public void down() {
+                time = System.currentTimeMillis();
+                if (rfv.canDo() && centerBottomMenu.isOpen())
                     centerBottomMenu.close(true);
+                last_time = time;
             }
         });
-
         initBtnListener(btns);
         play_btn = btns[5];
     }
@@ -224,21 +242,21 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (view == btns[5]) {
                     if (main_player == null) {
-                        Audio first_audio = ((AudioFragment) list.get(1)).getAudio(current_audio_num);
+                        Audio first_audio = audioFragment.getAudio(current_audio_num);
                         setAudio(first_audio, false);
                     } else {
                         if (main_player.isPlaying()) startOrPause(false);
                         else startOrPause(true);
                     }
                 } else if (view == btns[0]) {
-                    Audio next_audio = ((AudioFragment) list.get(1)).getAudio(++current_audio_num);
+                    Audio next_audio = audioFragment.getAudio(++current_audio_num);
                     if (next_audio != null) setAudio(next_audio, true);
                     else {
                         current_audio_num--;
                         Toast.makeText(MainActivity.this, "后面没有歌啦", Toast.LENGTH_SHORT).show();
                     }
                 } else if (view == btns[4]) {
-                    Audio pre_audio = ((AudioFragment) list.get(1)).getAudio(--current_audio_num);
+                    Audio pre_audio = audioFragment.getAudio(--current_audio_num);
                     if (pre_audio != null) setAudio(pre_audio, true);
                     else {
                         current_audio_num++;
@@ -259,6 +277,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setAudio(Audio audio, boolean play) {
+        //跳转
+        audioFragment.jumpToPositon(current_audio_num);
         current_audio = audio;
         editor.putString("lastAudioPath", current_audio.getPath());
         editor.putString("lastAudioAuthor", current_audio.getArtist());
@@ -288,9 +308,14 @@ public class MainActivity extends AppCompatActivity {
         main_player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
-                Audio next_audio = ((AudioFragment) list.get(1)).getAudio(++current_audio_num);
-                if (next_audio != null) setAudio(next_audio, true);
-                else current_audio_num--;
+//                //顺序
+//                Audio next_audio = audioFragment.getAudio(++current_audio_num);
+//                if (next_audio != null) setAudio(next_audio, true);
+//                else current_audio_num--;
+                //随机
+                current_audio_num = (int) (audioFragment.audios.size() * Math.random());
+                Audio next_audio = audioFragment.getAudio(current_audio_num);
+                setAudio(next_audio, true);
             }
         });
     }

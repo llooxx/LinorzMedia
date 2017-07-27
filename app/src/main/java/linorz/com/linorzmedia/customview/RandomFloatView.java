@@ -14,14 +14,14 @@ import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import linorz.com.linorzmedia.tools.StaticMethod;
 
 //可以拖动的按钮
 public class RandomFloatView extends android.support.v7.widget.AppCompatImageView {
     private int HANDLER_INT = 0;
-    private int basex = 0, basey = 0;
-    private int lastx = 0, lasty = 0;
+    private int basex = 0, basey = 0, lastx = 0, lasty = 0, left, top;
     private int round = 0;
     private int last_dir = 0;
     private FrameLayout.LayoutParams param;
@@ -30,6 +30,7 @@ public class RandomFloatView extends android.support.v7.widget.AppCompatImageVie
     private Timer timer;
     private boolean enable_touch = true;
     private int width, height, screenWidth = 0, screenHeight = 0;
+    private Action action;
 
     public RandomFloatView(Context context, int width, int height) {
         super(context);
@@ -42,8 +43,12 @@ public class RandomFloatView extends android.support.v7.widget.AppCompatImageVie
 
     public void initView(FrameLayout layout, double startx, double starty) {
         layout.addView(this);
-        basex = (int) (screenWidth * startx) - width / 2;
-        basey = (int) (screenHeight * starty);
+        screenWidth = layout.getMeasuredWidth();
+        screenHeight = layout.getMeasuredHeight();
+        basex = (int) (screenWidth * startx - width / 2);
+        basey = (int) (screenHeight * starty - height / 2);
+        left = layout.getLeft();
+        top = layout.getTop();
         round = 0;
         enable_touch = true;
         // 此句必须在最后初始化（否则需要很多判断它是否为null）
@@ -126,6 +131,7 @@ public class RandomFloatView extends android.support.v7.widget.AppCompatImageVie
                 is_moved = false;
                 lastx = nowx;
                 lasty = nowy;
+                if (action != null) action.down();
                 break;
             case MotionEvent.ACTION_MOVE:
                 moveToHere(param.leftMargin + (nowx - lastx),
@@ -143,16 +149,16 @@ public class RandomFloatView extends android.support.v7.widget.AppCompatImageVie
                                     old_y = param.topMargin + (nowy - lasty);
                             int back_x = old_x, back_y = old_y;
                             //判断水平
-                            if (nowx - width < 0) back_x = -width / 2;
-                            if (screenWidth - nowx - width < 0) back_x = screenWidth - width / 2;
+                            if (nowx - left - width < 0) back_x = -width / 2;
+                            if (screenWidth + left - nowx - width < 0)
+                                back_x = screenWidth - width / 2;
                             //判断垂直
 //                            if (param.topMargin < 0) back_y = 0;
 //                            if (screenHeight - 4 * height - param.topMargin < 0)
 //                                back_y = screenHeight - 4 * height;
-                            if (nowy - height < 0)
-                                back_y = -height / 2;
-                            if (screenHeight - nowy - height < 0)
-                                back_y = screenHeight - height*4;
+                            if (nowy - top - height < 0) back_y = -height / 2;
+                            if (screenHeight + top - nowy - height < 0)
+                                back_y = screenHeight - height / 2;
                             //边缘停靠
                             if (back_x != old_x || back_y != old_y)
                                 returnToScreen(back_x, back_y);
@@ -160,16 +166,17 @@ public class RandomFloatView extends android.support.v7.widget.AppCompatImageVie
                         }
                     }
                 }, 100);
+                if (action != null) action.up();
                 break;
         }
         return super.onTouchEvent(e1);
     }
 
     public boolean canDo() {
-        if (nowx - width < 0) return false;
-        if (screenWidth - nowx - width < 0) return false;
-        if (nowy - height < 0) return false;
-        if (screenHeight - nowy - height < 0) return false;
+        if (nowx - left - width < 0) return false;
+        if (screenWidth + left - nowx - width < 0) return false;
+        if (nowy - top - height < 0) return false;
+        if (screenHeight + top - nowy - height < 0) return false;
         return true;
     }
 
@@ -222,5 +229,15 @@ public class RandomFloatView extends android.support.v7.widget.AppCompatImageVie
     private int dipTopx(Context context, float dpValue) {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dpValue * scale + 0.5f);
+    }
+
+    public void setAction(Action action) {
+        this.action = action;
+    }
+
+    public interface Action {
+        void up();
+
+        void down();
     }
 }

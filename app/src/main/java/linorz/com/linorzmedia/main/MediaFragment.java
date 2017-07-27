@@ -63,8 +63,12 @@ public abstract class MediaFragment extends Fragment {
         if (!isEnd) load();
     }
 
-    public void jumpTop() {
+    protected void jumpTop() {
         recyclerView.smoothScrollToPosition(0);
+    }
+
+    protected void jumpToPositon(int i) {
+        recyclerView.smoothScrollToPosition(i);
     }
 
     protected abstract RecyclerView.Adapter getAdapter();
