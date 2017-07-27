@@ -2,12 +2,9 @@ package linorz.com.linorzmedia.main;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -18,7 +15,6 @@ import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -29,7 +25,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,8 +34,6 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
-import com.oguzdev.circularfloatingactionmenu.library.FloatingActionMenu;
-import com.oguzdev.circularfloatingactionmenu.library.animation.DefaultAnimationHandler;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,6 +42,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import linorz.com.linorzmedia.R;
+import linorz.com.linorzmedia.customview.FloatingAction.FloatingActionMenu;
+import linorz.com.linorzmedia.customview.FloatingAction.animation.DefaultAnimationHandler;
 import linorz.com.linorzmedia.customview.MyPageTransformer;
 import linorz.com.linorzmedia.customview.RandomFloatView;
 import linorz.com.linorzmedia.media.PlayActivity;
@@ -78,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
 //                    Manifest.permission.ACCESS_FINE_LOCATION,
 //                    Manifest.permission.ACCESS_COARSE_LOCATION,
 //                    Manifest.permission.CAMERA,
+                    Manifest.permission.SYSTEM_ALERT_WINDOW,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
                     Manifest.permission.READ_EXTERNAL_STORAGE
             });
@@ -108,6 +104,11 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }, 1000);
+
+        //启动悬浮窗
+//        Intent intent = new Intent(MainActivity.this, LinorzService.class);
+//        startService(intent);
+//        finish();
     }
 
     private void initView() {
