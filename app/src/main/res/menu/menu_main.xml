@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".main.MainActivity">
+    tools:context=".main.activity.MainActivity">
     <item
         android:id="@+id/select_music"
         android:orderInCategory="100"
@@ -11,6 +11,11 @@
         android:id="@+id/select_video"
         android:orderInCategory="100"
         android:title="选择视频"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/start_floatbtn"
+        android:orderInCategory="100"
+        android:title="开启浮游炮"
         app:showAsAction="never" />
 
 </menu>

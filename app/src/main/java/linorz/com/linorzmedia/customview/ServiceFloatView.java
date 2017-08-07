@@ -4,13 +4,20 @@ package linorz.com.linorzmedia.customview;
  * Created by linorz on 2017/7/27.
  */
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.os.Handler;
+import android.os.Message;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.DecelerateInterpolator;
 import android.view.animation.TranslateAnimation;
-import java.util.Timer;
+
+import java.util.concurrent.TimeUnit;
+
 
 //可以拖动的按钮
 public class ServiceFloatView extends android.support.v7.widget.AppCompatImageView {
@@ -21,6 +28,7 @@ public class ServiceFloatView extends android.support.v7.widget.AppCompatImageVi
     private boolean is_moved = false;
     private boolean enable_touch = true;
     private int width, height, screenWidth = 0, screenHeight = 0;
+    private ServiceFloatView.Action action;
 
     public ServiceFloatView(Context context, int width, int height) {
         super(context);
@@ -61,6 +69,7 @@ public class ServiceFloatView extends android.support.v7.widget.AppCompatImageVi
                 is_moved = false;
                 lastx = nowx;
                 lasty = nowy;
+                if (action != null) action.down();
                 break;
             case MotionEvent.ACTION_MOVE:
                 moveToHere(param.x + (nowx - lastx),
@@ -79,14 +88,14 @@ public class ServiceFloatView extends android.support.v7.widget.AppCompatImageVi
                             int back_x = old_x, back_y = old_y;
                             //判断水平
                             if (nowx - width < 0)
-                                back_x = -width / 2;
+                                back_x = 0;
                             if (screenWidth - nowx - width < 0)
-                                back_x = screenWidth - width / 2;
+                                back_x = screenWidth - width;
                             //判断垂直
                             if (nowy - height < 0)
-                                back_y = -height / 2;
+                                back_y = 0;
                             if (screenHeight - nowy - height < 0)
-                                back_y = screenHeight - height/2;
+                                back_y = screenHeight - height;
                             //边缘停靠
                             if (back_x != old_x || back_y != old_y)
                                 returnToScreen(back_x, back_y);
@@ -94,6 +103,7 @@ public class ServiceFloatView extends android.support.v7.widget.AppCompatImageVi
                         }
                     }
                 }, 100);
+                if (action != null) action.up();
                 break;
         }
         return super.onTouchEvent(e1);
@@ -107,18 +117,40 @@ public class ServiceFloatView extends android.support.v7.widget.AppCompatImageVi
         return true;
     }
 
-    private void returnToScreen(final int x, final int y) {
-        // 开启移动动画//////////from与to是指相对当前位置的变化
-        TranslateAnimation ta = new TranslateAnimation(0, -param.x + x, 0, -param.y + y);
-        ta.setDuration(200);
-        startAnimation(ta);
-        // 设置回到正常的布局位置
-        new Handler().postDelayed(new Runnable() {
-            public void run() {
-                clearAnimation();
-                moveToHere(x, y);
+    Handler handler = new Handler(new Handler.Callback() {
+        int old_x, old_y;
+        double xx, yy;
+        int i = 0;
+
+        @Override
+        public boolean handleMessage(Message message) {
+            switch (message.what) {
+                case 1:
+                    int xy[] = (int[]) message.obj;
+                    int x = xy[0];
+                    int y = xy[1];
+                    old_x = param.x + (nowx - lastx);
+                    old_y = param.y + (nowy - lasty);
+                    xx = (x - old_x) / 5.0;
+                    yy = (y - old_y) / 5.0;
+                    i = 0;
+                    handler.sendMessage(Message.obtain(handler, 2));
+                    break;
+                case 2:
+                    moveToHere((int) (old_x + xx * i), (int) (old_y + yy * i));
+                    i++;
+                    if (i <= 5) handler.sendMessage(Message.obtain(handler, 2));
+                    break;
             }
-        }, 200);
+            return false;
+        }
+    });
+
+    private void returnToScreen(final int x, final int y) {
+        Message message = new Message();
+        message.what = 1;
+        message.obj = new int[]{x, y};
+        handler.sendMessage(message);
     }
 
     private void moveToHere(int tempx, int tempy) {
@@ -126,11 +158,20 @@ public class ServiceFloatView extends android.support.v7.widget.AppCompatImageVi
         param.y = tempy;
         //刷新
         wm.updateViewLayout(this, param);
-        invalidate();
     }
 
     private int dipTopx(Context context, float dpValue) {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dpValue * scale + 0.5f);
+    }
+
+    public void setAction(ServiceFloatView.Action action) {
+        this.action = action;
+    }
+
+    public interface Action {
+        void up();
+
+        void down();
     }
 }

@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.main;
+package linorz.com.linorzmedia.main.fragment;
 
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import linorz.com.linorzmedia.main.adapter.ImageAdapter;
 import linorz.com.linorzmedia.mediatools.Image;
 import linorz.com.linorzmedia.mediatools.ImageProvider;
 
@@ -25,18 +26,11 @@ public class ImageFragment extends MediaFragment {
 
     @Override
     protected void load() {
-        int ii;
-        if (num + 20 < images.size()) ii = 20;
-        else {
-            ii = images.size() % 20;
-            isEnd = true;
-        }
-        for (int i = num; i < num + ii; i++) {
+        for (int i = 0; i < images.size(); i++) {
             Map<String, Object> map = new HashMap<>();
             map.put("path", images.get(i).getPath());
             items.add(map);
         }
-        recyclerView.notifyMoreFinish(true);
-        num = num + 20;
+        adapter.notifyDataSetChanged();
     }
 }

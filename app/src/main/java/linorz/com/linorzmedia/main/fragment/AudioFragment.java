@@ -1,5 +1,7 @@
-package linorz.com.linorzmedia.main;
+package linorz.com.linorzmedia.main.fragment;
 
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
@@ -7,6 +9,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import linorz.com.linorzmedia.main.adapter.PlayAudio;
+import linorz.com.linorzmedia.main.adapter.AudioAdapter;
 import linorz.com.linorzmedia.mediatools.Audio;
 import linorz.com.linorzmedia.mediatools.AudioProvider;
 import linorz.com.linorzmedia.tools.StaticMethod;
@@ -17,10 +21,38 @@ import linorz.com.linorzmedia.tools.StaticMethod;
 public class AudioFragment extends MediaFragment {
     public ArrayList<Audio> audios;
     private PlayAudio playAudio;
+    public int last_num = 0;
+
+    private Handler handler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message message) {
+            int n = message.what;
+            boolean k = (boolean) message.obj;
+
+            Map<String, Object> map = items.get(n);
+            map.put("isPlay", k);
+            if (recyclerView.getScrollState() != RecyclerView.SCROLL_STATE_IDLE
+                    || (!recyclerView.isComputingLayout())) {
+                adapter.notifyItemChanged(n);
+            }
+            return false;
+        }
+    });
 
     public Audio getAudio(int i) {
-        if (i >= 0 && i < audios.size()) return audios.get(i);
-        else return null;
+        if (i >= 0 && i < audios.size()) {
+            changeColor(last_num, false);
+            last_num = i;
+            changeColor(last_num, true);
+            return audios.get(i);
+        } else return null;
+    }
+
+    public void changeColor(int i, boolean isPlay) {
+        Message message = new Message();
+        message.what = i;
+        message.obj = isPlay;
+        handler.sendMessageDelayed(message, 0);
     }
 
     @Override
@@ -48,20 +80,14 @@ public class AudioFragment extends MediaFragment {
 
     @Override
     protected void load() {
-        int ii;
-        if (num + 20 < audios.size()) ii = 20;
-        else {
-            ii = audios.size() % 20;
-            isEnd = true;
-        }
-        for (int i = num; i < num + ii; i++) {
+        for (int i = 0; i < audios.size(); i++) {
             Map<String, Object> map = new HashMap<>();
             map.put("name", audios.get(i).getTitle());
             map.put("time", StaticMethod.getMusicTime(audios.get(i).getDuration()));
             map.put("path", "file://" + audios.get(i).getPath());
+            map.put("isPlay", false);
             items.add(map);
         }
-        recyclerView.notifyMoreFinish(true);
-        num = num + 20;
+        adapter.notifyDataSetChanged();
     }
 }

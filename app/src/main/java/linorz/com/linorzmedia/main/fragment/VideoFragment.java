@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.main;
+package linorz.com.linorzmedia.main.fragment;
 
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import linorz.com.linorzmedia.main.adapter.PlayAudio;
+import linorz.com.linorzmedia.main.adapter.VideoAdapter;
 import linorz.com.linorzmedia.tools.StaticMethod;
 import linorz.com.linorzmedia.mediatools.Video;
 import linorz.com.linorzmedia.mediatools.VideoProvider;
@@ -31,7 +33,6 @@ public class VideoFragment extends MediaFragment {
 
             @Override
             public void playAudioTwo(int i) {
-
             }
         });
         return videoAdapter;
@@ -46,22 +47,16 @@ public class VideoFragment extends MediaFragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                int ii;
-                if (num + 20 < videos.size()) ii = 20;
-                else {
-                    ii = videos.size() % 20;
-                    isEnd = true;
-                }
-                for (int i = num; i < num + ii; i++) {
+                for (int i = 0; i < videos.size(); i++) {
+                    final int ii = i;
                     Map<String, Object> map = new HashMap<>();
                     map.put("img", StaticMethod.createVideoThumbnail(videos.get(i).getPath()));
                     map.put("name", videos.get(i).getTitle());
                     map.put("time", StaticMethod.getMusicTime(videos.get(i).getDuration()));
                     map.put("path", "file://" + videos.get(i).getPath());
                     items.add(map);
+                    adapter.notifyItemInserted(ii);
                 }
-                recyclerView.notifyMoreFinish(true);
-                num = num + 20;
             }
         }).start();
     }

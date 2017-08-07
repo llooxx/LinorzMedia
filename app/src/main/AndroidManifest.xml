@@ -17,7 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".main.MainActivity"
+            android:name=".main.activity.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -61,7 +61,7 @@
         </activity>
         <activity android:name=".media.ZoomImage" />
         <activity android:name=".media.MoreImagesActivity" />
-        <service android:name=".main.LinorzService"/>
+        <service android:name=".main.service.LinorzService"/>
     </application>
 
 </manifest>

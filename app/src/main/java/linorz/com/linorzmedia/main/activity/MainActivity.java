@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.main;
+package linorz.com.linorzmedia.main.activity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -23,6 +23,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -46,9 +49,15 @@ import linorz.com.linorzmedia.customview.FloatingAction.FloatingActionMenu;
 import linorz.com.linorzmedia.customview.FloatingAction.animation.DefaultAnimationHandler;
 import linorz.com.linorzmedia.customview.MyPageTransformer;
 import linorz.com.linorzmedia.customview.RandomFloatView;
+import linorz.com.linorzmedia.main.service.LinorzService;
+import linorz.com.linorzmedia.main.adapter.PagerAdapter;
+import linorz.com.linorzmedia.main.adapter.PlayAudio;
+import linorz.com.linorzmedia.main.fragment.AudioFragment;
+import linorz.com.linorzmedia.main.fragment.ImageFragment;
+import linorz.com.linorzmedia.main.fragment.MediaFragment;
+import linorz.com.linorzmedia.main.fragment.VideoFragment;
 import linorz.com.linorzmedia.media.PlayActivity;
 import linorz.com.linorzmedia.mediatools.Audio;
-import linorz.com.linorzmedia.mediatools.Video;
 import linorz.com.linorzmedia.tools.StaticMethod;
 
 public class MainActivity extends AppCompatActivity {
@@ -68,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences mySharedPreferences;
     private SharedPreferences.Editor editor;
     private Audio current_audio;
+    private RotateAnimation animation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,21 +109,20 @@ public class MainActivity extends AppCompatActivity {
                     Audio first_audio = audioFragment.getAudio(current_audio_num);
                     setAudio(first_audio, false);
                 } else {
-                    Audio first_audio = new Audio();
-                    first_audio.setPath(path);
-                    first_audio.setArtist(mySharedPreferences.getString("lastAudioAuthor", "获取失败"));
-                    first_audio.setTitle(mySharedPreferences.getString("lastAudioTitle", "获取失败"));
+//                    Audio first_audio = new Audio();
+//                    first_audio.setPath(path);
+//                    first_audio.setArtist(mySharedPreferences.getString("lastAudioAuthor", "获取失败"));
+//                    first_audio.setTitle(mySharedPreferences.getString("lastAudioTitle", "获取失败"));
+//                    current_audio_num = mySharedPreferences.getInt("lastAudioNum", 0);
+//                    setAudio(first_audio, false);
+
                     current_audio_num = mySharedPreferences.getInt("lastAudioNum", 0);
-                    setAudio(first_audio, false);
+                    setAudio(audioFragment.getAudio(current_audio_num), false);
                 }
             }
         }, 1000);
 
         viewPager.setCurrentItem(1);
-        //启动悬浮窗
-//        Intent intent = new Intent(MainActivity.this, LinorzService.class);
-//        startService(intent);
-//        finish();
     }
 
     private void initView() {
@@ -208,6 +217,7 @@ public class MainActivity extends AppCompatActivity {
                 if ((time - last_time) < 1000 && rfv.canDo() && !centerBottomMenu.isOpen())
                     centerBottomMenu.open(true);
                 last_time = time;
+
             }
 
             @Override
@@ -215,11 +225,23 @@ public class MainActivity extends AppCompatActivity {
                 time = System.currentTimeMillis();
                 if (rfv.canDo() && centerBottomMenu.isOpen())
                     centerBottomMenu.close(true);
+                else
+                    rfv.startAnimation(animation);
                 last_time = time;
             }
         });
         initBtnListener(btns);
         play_btn = btns[5];
+        //设置动画
+        setAnimation(0);
+    }
+
+    private void setAnimation(float degree) {
+        animation = new RotateAnimation(0f + degree, 359f + degree,
+                Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        animation.setInterpolator(new LinearInterpolator());
+        animation.setRepeatCount(-1);
+        animation.setDuration(3000);
     }
 
     private ImageView[] getSubButton(ViewGroup parentView) {
@@ -370,6 +392,12 @@ public class MainActivity extends AppCompatActivity {
                 intent.setType("video/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(intent, 1);
+                break;
+            case R.id.start_floatbtn:
+                //启动悬浮窗
+                Intent intent2 = new Intent(MainActivity.this, LinorzService.class);
+                startService(intent2);
+                finish();
                 break;
             default:
                 break;

@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.main;
+package linorz.com.linorzmedia.main.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import linorz.com.linorzmedia.R;
-import linorz.com.linorzmedia.customview.LoadMoreRecyclerView;
+import linorz.com.linorzmedia.customview.LinorzRecyclerView;
 
 /**
  * Created by linorz on 2016/5/9.
@@ -25,11 +25,9 @@ import linorz.com.linorzmedia.customview.LoadMoreRecyclerView;
 public abstract class MediaFragment extends Fragment {
     protected View rootView;
     protected Context context;
-    protected LoadMoreRecyclerView recyclerView;
+    protected LinorzRecyclerView recyclerView;
     protected RecyclerView.Adapter adapter;
     protected List<Map<String, Object>> items;
-    protected int num = 0;
-    protected boolean isEnd = false;
 
     @Nullable
     @Override
@@ -46,29 +44,22 @@ public abstract class MediaFragment extends Fragment {
     }
 
     protected void initAllView(View view) {
-        recyclerView = (LoadMoreRecyclerView) view.findViewById(R.id.recycler);
+        recyclerView = (LinorzRecyclerView) view.findViewById(R.id.recycler);
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setOnPauseListenerParams(ImageLoader.getInstance(), false, true);
-        recyclerView.setAutoLoadMoreEnable(true);
         items = new ArrayList<>();
         adapter = getAdapter();
         recyclerView.setAdapter(adapter);
-        recyclerView.setLoadMoreListener(new LoadMoreRecyclerView.LoadMoreListener() {
-            @Override
-            public void onLoadMore() {
-                if (!isEnd) load();
-            }
-        });
-        if (!isEnd) load();
+        load();
     }
 
-    protected void jumpTop() {
+    public void jumpTop() {
         recyclerView.smoothScrollToPosition(0);
     }
 
-    protected void jumpToPositon(int i) {
-        recyclerView.smoothScrollToPosition(i);
+    public void jumpToPositon(int i) {
+        recyclerView.scrollToPosition(i);
     }
 
     protected abstract RecyclerView.Adapter getAdapter();

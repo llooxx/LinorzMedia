@@ -1,11 +1,9 @@
-package linorz.com.linorzmedia.main;
+package linorz.com.linorzmedia.main.service;
 
 /**
  * Created by linorz on 2017/7/27.
  */
 
-import android.app.ActivityManager;
-import android.app.Instrumentation;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -13,25 +11,23 @@ import android.graphics.PixelFormat;
 import android.os.Binder;
 import android.os.IBinder;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
-import java.io.IOException;
-import java.util.List;
 
 import linorz.com.linorzmedia.R;
+import linorz.com.linorzmedia.customview.FloatingAction.FloatingActionMenu;
+import linorz.com.linorzmedia.customview.FloatingAction.animation.DefaultAnimationHandler;
 import linorz.com.linorzmedia.customview.ServiceFloatView;
 import linorz.com.linorzmedia.tools.StaticMethod;
 
 public class LinorzService extends Service {
 
     private final IBinder mBinder = new LocalBinder();
-    WindowManager.LayoutParams wml;
-    ServiceFloatView rfv;
+    private WindowManager.LayoutParams wml;
+    private ServiceFloatView rfv;
 
     @Override
     public void onCreate() {
@@ -63,30 +59,43 @@ public class LinorzService extends Service {
         rfv.setBackgroundResource(R.drawable.blue_circle);
         rfv.initView(wml, 1, 0.5);
 
-//        ImageView[] btns = getSubButton(null);
+        ImageView[] btns = getSubButton(null);
 
-//        int wh = StaticMethod.dipTopx(this, 50);
-//        final FloatingActionMenu centerBottomMenu = new FloatingActionMenu
-//                .Builder(this, true)
-//                .setStartAngle(-30)
-//                .addSubActionView(btns[0], wh, wh)
-//                .addSubActionView(btns[1], wh, wh)
-//                .addSubActionView(btns[2], wh, wh)
-//                .addSubActionView(btns[3], wh, wh)
-//                .addSubActionView(btns[4], wh, wh)
-//                .addSubActionView(btns[5], wh, wh)
-//                .attachTo(rfv).build();
+        int wh = StaticMethod.dipTopx(this, 50);
+        final FloatingActionMenu centerBottomMenu = new FloatingActionMenu
+                .Builder(this, true)
+                .setStartAngle(-30)
+                .setAnimationHandler(new DefaultAnimationHandler()
+                        .setDuration(100).setBetweenTime(10))
+                .addSubActionView(btns[0], wh, wh)
+                .addSubActionView(btns[1], wh, wh)
+                .addSubActionView(btns[2], wh, wh)
+                .addSubActionView(btns[3], wh, wh)
+                .addSubActionView(btns[4], wh, wh)
+                .addSubActionView(btns[5], wh, wh)
+                .attachTo(rfv).build();
 
-        rfv.setOnClickListener(new View.OnClickListener() {
+        rfv.setOnClickListener(null);
+        rfv.setAction(new ServiceFloatView.Action() {
+            long time = 0, last_time = 0;
+
             @Override
-            public void onClick(View view) {
-//                if (rfv.canDo())
-//                    centerBottomMenu.toggle(true);
-//                else if (centerBottomMenu.isOpen())
-//                    centerBottomMenu.close(true);
+            public void up() {
+                time = System.currentTimeMillis();
+                if ((time - last_time) < 1000 && rfv.canDo() && !centerBottomMenu.isOpen())
+                    centerBottomMenu.open(true);
+                last_time = time;
+
+            }
+
+            @Override
+            public void down() {
+                time = System.currentTimeMillis();
+                if (rfv.canDo() && centerBottomMenu.isOpen())
+                    centerBottomMenu.close(true);
+                last_time = time;
             }
         });
-
     }
 
     private ImageView[] getSubButton(ViewGroup parentView) {
@@ -116,6 +125,7 @@ public class LinorzService extends Service {
                 WindowManager.LayoutParams.TYPE_SYSTEM_ALERT, // z-ordering
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT);
+        params.windowAnimations = android.R.style.Animation_Translucent;
         params.format = PixelFormat.RGBA_8888;
         params.gravity = Gravity.TOP | Gravity.LEFT;
         return params;

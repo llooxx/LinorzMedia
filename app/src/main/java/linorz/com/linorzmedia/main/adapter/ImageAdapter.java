@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.main;
+package linorz.com.linorzmedia.main.adapter;
 
 import android.app.Activity;
 import android.content.Context;
@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import linorz.com.linorzmedia.R;
+import linorz.com.linorzmedia.main.activity.MainActivity;
 import linorz.com.linorzmedia.media.MoreImagesActivity;
 import linorz.com.linorzmedia.media.ZoomImage;
 import linorz.com.linorzmedia.tools.StaticMethod;
@@ -57,19 +58,19 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageItem> {
         ImageLoader.getInstance().displayImage("file://" + imageItem.path, imageItem.img, MainActivity.mOptions);
         urls.add("file://" + imageItem.path);
 
-        imageItem.img.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(context, MoreImagesActivity.class);
-                intent.putExtra("urls", urls);
-                intent.putExtra("num", i);
-                context.startActivity(intent);
-            }
-        });
+//        imageItem.img.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent intent = new Intent(context, MoreImagesActivity.class);
+//                intent.putExtra("urls", urls);
+//                intent.putExtra("num", i);
+//                context.startActivity(intent);
+//            }
+//        });
     }
 
     private void setWH(ImageView img, int ow, int oh) {
-        StaggeredGridLayoutManager.LayoutParams lp = (StaggeredGridLayoutManager.LayoutParams) img.getLayoutParams();
+        ViewGroup.LayoutParams lp = img.getLayoutParams();
         lp.width = StaticMethod.pxTodip(context, screenWidth - 30);
         lp.height = lp.width * oh / ow;
         img.setLayoutParams(lp);
@@ -88,14 +89,14 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageItem> {
         public ImageItem(View view) {
             super(view);
             img = (ImageView) view.findViewById(R.id.item_img);
-//            view.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//                    Intent intent = new Intent(context, ZoomImage.class);
-//                    intent.putExtra("path", path);
-//                    context.startActivity(intent);
-//                }
-//            });
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(context, ZoomImage.class);
+                    intent.putExtra("path", path);
+                    context.startActivity(intent);
+                }
+            });
         }
     }
 }

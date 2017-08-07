@@ -4,10 +4,11 @@
     <color name="colorPrimaryDark">#436cf1</color>
     <color name="colorAccent">#43cbf1</color>
     <color name="white">#ffffff</color>
+    <color name="transparentWhite">#7dffffff</color>
     <color name="black">#000000</color>
     <color name="blue">#43a2f1</color>
     <color name="transparentBlue">#af43a2f1</color>
-
+    <color name="textGray">#696969</color>
     <!--<color name="colorPrimary">#f78e3e</color>-->
     <!--<color name="colorPrimaryDark">#f9842b</color>-->
     <!--<color name="colorAccent">#ffb160</color>-->

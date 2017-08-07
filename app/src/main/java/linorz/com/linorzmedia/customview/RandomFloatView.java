@@ -3,22 +3,20 @@ package linorz.com.linorzmedia.customview;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import android.view.MotionEvent;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.DecelerateInterpolator;
 import android.view.animation.TranslateAnimation;
-import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-
-import linorz.com.linorzmedia.tools.StaticMethod;
 
 //可以拖动的按钮
+@SuppressLint("ViewConstructor")
 public class RandomFloatView extends android.support.v7.widget.AppCompatImageView {
     private int HANDLER_INT = 0;
     private int basex = 0, basey = 0, lastx = 0, lasty = 0, left, top;
@@ -206,17 +204,36 @@ public class RandomFloatView extends android.support.v7.widget.AppCompatImageVie
 
     private void returnToScreen(final int x, final int y) {
         // 开启移动动画//////////from与to是指相对当前位置的变化
-        TranslateAnimation ta = new TranslateAnimation(0, -param.leftMargin
+        final TranslateAnimation ta = new TranslateAnimation(0, -param.leftMargin
                 + x, 0, -param.topMargin + y);
         ta.setDuration(200);
-        startAnimation(ta);
-        // 设置回到正常的布局位置
-        new Handler().postDelayed(new Runnable() {
-            public void run() {
-                clearAnimation();
+        ta.setInterpolator(new DecelerateInterpolator());
+        ta.setFillAfter(true);
+        ta.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                ta.cancel();
                 moveToHere(x, y);
             }
-        }, 200);
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        startAnimation(ta);
+//        // 设置回到正常的布局位置
+//        new Handler().postDelayed(new Runnable() {
+//            public void run() {
+//                clearAnimation();
+//                moveToHere(x, y);
+//            }
+//        }, 200);
     }
 
     private void moveToHere(int tempx, int tempy) {
