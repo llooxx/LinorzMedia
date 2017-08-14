@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
     private TimerTask tt;
     private RotateAnimation animation;
     private AudioPlay audioPlay;
+    private Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -323,28 +324,42 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent = new Intent();
+        Intent intent2 = new Intent();
         switch (item.getItemId()) {
             case R.id.select_music:
-                intent.setType("audio/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
+                intent2.setType("audio/*");
+                intent2.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(intent, 0);
                 break;
             case R.id.select_video:
-                intent.setType("video/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
+                intent2.setType("video/*");
+                intent2.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(intent, 1);
                 break;
             case R.id.start_floatbtn:
                 //启动悬浮窗
-                Intent intent2 = new Intent(MainActivity.this, LinorzService.class);
-                startService(intent2);
+                intent = new Intent(this, LinorzService.class);
+                startService(intent);
                 finish();
                 break;
             default:
                 break;
         }
         return true;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (intent != null) {
+            stopService(intent);
+            finish();
+        }
     }
 
     @Override
