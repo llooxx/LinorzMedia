@@ -2,10 +2,7 @@ package linorz.com.linorzmedia.main.activity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -32,11 +29,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,6 +41,7 @@ import linorz.com.linorzmedia.customview.FloatingAction.FloatingActionMenu;
 import linorz.com.linorzmedia.customview.FloatingAction.animation.DefaultAnimationHandler;
 import linorz.com.linorzmedia.customview.MyPageTransformer;
 import linorz.com.linorzmedia.customview.RandomFloatView;
+import linorz.com.linorzmedia.main.AudioPlay;
 import linorz.com.linorzmedia.main.service.LinorzService;
 import linorz.com.linorzmedia.main.adapter.PagerAdapter;
 import linorz.com.linorzmedia.main.adapter.PlayAudio;
@@ -61,10 +54,8 @@ import linorz.com.linorzmedia.mediatools.Audio;
 import linorz.com.linorzmedia.tools.StaticMethod;
 
 public class MainActivity extends AppCompatActivity {
-    public static DisplayImageOptions mOptions;
     private ViewPager viewPager;
     private List<MediaFragment> list;
-    private MediaPlayer main_player;
     private VideoFragment videoFragment;
     private AudioFragment audioFragment;
     private ImageFragment imageFragment;
@@ -73,20 +64,14 @@ public class MainActivity extends AppCompatActivity {
     private SeekBar audio_seekbar;
     private Timer t;
     private TimerTask tt;
-    private int current_audio_num = 0;
-    private SharedPreferences mySharedPreferences;
-    private SharedPreferences.Editor editor;
-    private Audio current_audio;
     private RotateAnimation animation;
+    private AudioPlay audioPlay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             String[] permissions = StaticMethod.checkSelfPermissionArray(this, new String[]{
-//                    Manifest.permission.ACCESS_FINE_LOCATION,
-//                    Manifest.permission.ACCESS_COARSE_LOCATION,
-//                    Manifest.permission.CAMERA,
                     Manifest.permission.SYSTEM_ALERT_WINDOW,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
                     Manifest.permission.READ_EXTERNAL_STORAGE
@@ -96,33 +81,17 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         setContentView(R.layout.activity_main);
-        //缓存
-        mySharedPreferences = getSharedPreferences("LinorzMedia", Context.MODE_PRIVATE);
-        editor = mySharedPreferences.edit();
-        initImageLoader(this);
         initView();
+        viewPager.setCurrentItem(1);
+
         new Handler().postDelayed(new Runnable() {
             public void run() {
                 initFab();//开线程时，已经绘制完成，能获得view的宽高
-                String path = mySharedPreferences.getString("lastAudioPath", null);
-                if (path == null) {
-                    Audio first_audio = audioFragment.getAudio(current_audio_num);
-                    setAudio(first_audio, false);
-                } else {
-//                    Audio first_audio = new Audio();
-//                    first_audio.setPath(path);
-//                    first_audio.setArtist(mySharedPreferences.getString("lastAudioAuthor", "获取失败"));
-//                    first_audio.setTitle(mySharedPreferences.getString("lastAudioTitle", "获取失败"));
-//                    current_audio_num = mySharedPreferences.getInt("lastAudioNum", 0);
-//                    setAudio(first_audio, false);
-
-                    current_audio_num = mySharedPreferences.getInt("lastAudioNum", 0);
-                    setAudio(audioFragment.getAudio(current_audio_num), false);
-                }
+//                audioPlay.init();
+                audioPlay.current_num = audioPlay.getLastAudioNum();
+                setAudio(audioPlay.current_num, false);
             }
-        }, 1000);
-
-        viewPager.setCurrentItem(1);
+        }, 500);
     }
 
     private void initView() {
@@ -143,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
         list.add(videoFragment);
         list.add(audioFragment);
         list.add(imageFragment);
+        audioPlay = audioFragment.getAudioPlay();
 
         list_title.add("video");
         list_title.add("audio");
@@ -156,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
         videoFragment.setPlayAudioListener(new PlayAudio() {
             @Override
             public void playAudio(int i) {
-                if (main_player != null && main_player.isPlaying()) startOrPause(false);
+                if (audioPlay.isPlaying()) startOrPause(false);
             }
 
             @Override
@@ -167,16 +137,14 @@ public class MainActivity extends AppCompatActivity {
         audioFragment.setPlayAudioListener(new PlayAudio() {
             @Override
             public void playAudio(int i) {
-                if (i == current_audio_num) return;
-                Audio audio = audioFragment.getAudio(i);
-                setAudio(audio, true);
-                current_audio_num = i;
+                if (i == audioPlay.current_num) return;
+                setAudio(i, true);
             }
 
             @Override
             public void playAudioTwo(int i) {
-                if (main_player != null && main_player.isPlaying()) startOrPause(false);
-                Audio audio = audioFragment.getAudio(i);
+                if (audioPlay.isPlaying()) startOrPause(false);
+                Audio audio = audioPlay.getAudio(i);
                 StaticMethod.currentDuration = -1;
                 Intent intent = new Intent(MainActivity.this, PlayActivity.class);
                 intent.putExtra("path", "file://" + audio.getPath());
@@ -263,33 +231,30 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (view == btns[5]) {
-                    if (main_player == null) {
-                        Audio first_audio = audioFragment.getAudio(current_audio_num);
-                        setAudio(first_audio, false);
-                    } else {
-                        if (main_player.isPlaying()) startOrPause(false);
-                        else startOrPause(true);
-                    }
+                    //播放暂停
+                    if (audioPlay.isPlaying()) startOrPause(false);
+                    else startOrPause(true);
                 } else if (view == btns[0]) {
-                    Audio next_audio = audioFragment.getAudio(++current_audio_num);
-                    if (next_audio != null) setAudio(next_audio, true);
-                    else {
-                        current_audio_num--;
+                    //下一个
+                    if (!setAudio(++audioPlay.current_num, true)) {
+                        audioPlay.current_num--;
                         Toast.makeText(MainActivity.this, "后面没有歌啦", Toast.LENGTH_SHORT).show();
                     }
                 } else if (view == btns[4]) {
-                    Audio pre_audio = audioFragment.getAudio(--current_audio_num);
-                    if (pre_audio != null) setAudio(pre_audio, true);
-                    else {
-                        current_audio_num++;
-                        Toast.makeText(MainActivity.this, "前面没有歌啦", Toast.LENGTH_SHORT).show();
+                    //前一个
+                    if (!setAudio(--audioPlay.current_num, true)) {
+                        audioPlay.current_num++;
+                        Toast.makeText(MainActivity.this, "后面没有歌啦", Toast.LENGTH_SHORT).show();
                     }
-                } else if (view == btns[2])
+                } else if (view == btns[2]) {
+                    //回到顶端
                     list.get(viewPager.getCurrentItem()).jumpTop();
-                else if (view == btns[1]) {
+                } else if (view == btns[1]) {
+                    //增大音量
                     int currentVolume = StaticMethod.getCurrentVolume(MainActivity.this);
                     StaticMethod.setVolume(MainActivity.this, ++currentVolume);
                 } else if (view == btns[3]) {
+                    //减小音量
                     int currentVolume = StaticMethod.getCurrentVolume(MainActivity.this);
                     StaticMethod.setVolume(MainActivity.this, --currentVolume);
                 }
@@ -298,60 +263,37 @@ public class MainActivity extends AppCompatActivity {
         for (ImageView btn : btns) btn.setOnClickListener(onClickListener);
     }
 
-    private void setAudio(Audio audio, boolean play) {
-        //跳转
-        audioFragment.jumpToPositon(current_audio_num);
-        current_audio = audio;
-        editor.putString("lastAudioPath", current_audio.getPath());
-        editor.putString("lastAudioAuthor", current_audio.getArtist());
-        editor.putString("lastAudioTitle", current_audio.getTitle());
-        editor.putInt("lastAudioNum", current_audio_num);
-        editor.commit();
-        try {
+    private boolean setAudio(int num, boolean play) {
+        boolean result = audioPlay.setAudio(num, play);
+        if (result) {
+            Audio audio = audioPlay.getCurrentAudio();
+            //跳转
+            audioFragment.jumpToPositon(num);
+            audioFragment.changeAudio(num);
             audio_title.setText(audio.getTitle());
             audio_author.setText(audio.getArtist());
-            if (main_player != null) main_player.release();
-            main_player = new MediaPlayer();
-            main_player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            main_player.setDataSource("file://" + audio.getPath());
-            main_player.prepare();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (play) {
-            main_player.start();
-            audio_state.setText("正在播放");
-            play_btn.setImageResource(R.drawable.btn_pause_white);
-        } else {
-            audio_state.setText("已暂停");
-            play_btn.setImageResource(R.drawable.btn_play_white);
-        }
-        setVideoTimeTask(main_player);
-        main_player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-//                //顺序
-//                Audio next_audio = audioFragment.getAudio(++current_audio_num);
-//                if (next_audio != null) setAudio(next_audio, true);
-//                else current_audio_num--;
-                //随机
-                current_audio_num = (int) (audioFragment.audios.size() * Math.random());
-                Audio next_audio = audioFragment.getAudio(current_audio_num);
-                setAudio(next_audio, true);
+            if (play) {
+                audio_state.setText("正在播放");
+                play_btn.setImageResource(R.drawable.btn_pause_white);
+            } else {
+                audio_state.setText("已暂停");
+                play_btn.setImageResource(R.drawable.btn_play_white);
             }
-        });
+            setVideoTimeTask();
+        }
+        return result;
     }
 
-    private void setVideoTimeTask(final MediaPlayer mediaPlayer) {
+    private void setVideoTimeTask() {
         if (t != null) t.cancel();
         if (tt != null) tt.cancel();
-        audio_seekbar.setMax(mediaPlayer.getDuration());
+        audio_seekbar.setMax(audioPlay.getDuration());
         t = new Timer();
         tt = new TimerTask() {
             @Override
             public void run() {
                 try {
-                    audio_seekbar.setProgress(mediaPlayer.getCurrentPosition());
+                    audio_seekbar.setProgress(audioPlay.getCurrentPosition());
                 } catch (Exception e) {
                     t.cancel();
                     tt.cancel();
@@ -365,11 +307,11 @@ public class MainActivity extends AppCompatActivity {
         if (sp) {
             play_btn.setImageResource(R.drawable.btn_pause_white);
             audio_state.setText("正在播放");
-            main_player.start();
+            audioPlay.start();
         } else {
             play_btn.setImageResource(R.drawable.btn_play_white);
             audio_state.setText("已暂停");
-            main_player.pause();
+            audioPlay.pause();
         }
     }
 
@@ -419,26 +361,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void initImageLoader(Context context) {
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context)
-                .threadPriority(Thread.NORM_PRIORITY - 2)
-                .denyCacheImageMultipleSizesInMemory()
-                .diskCacheFileNameGenerator(new Md5FileNameGenerator())
-                .diskCacheSize(200 * 1024 * 1024) // 200 Mb
-                .tasksProcessingOrder(QueueProcessingType.LIFO)
-                .build();
-        ImageLoader.getInstance().init(config);
-        //统一使用
-        mOptions = new DisplayImageOptions.Builder()
-                .showImageOnLoading(R.color.white)   //加载过程中
-                .showImageForEmptyUri(R.color.white) //uri为空时
-                .showImageOnFail(R.color.white)      //加载失败时
-                .cacheOnDisk(true)
-                .cacheInMemory(true)                             //允许cache在内存和磁盘中
-                .bitmapConfig(Bitmap.Config.RGB_565)             //图片压缩质量参数
-                .build();
-    }
-
 
     @SuppressLint("ShowToast")
     @Override
@@ -448,7 +370,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (t != null) t.cancel();
                 if (tt != null) tt.cancel();
-                if (main_player != null) main_player.stop();
+                audioPlay.stop();
                 finish();
             }
         }).show();

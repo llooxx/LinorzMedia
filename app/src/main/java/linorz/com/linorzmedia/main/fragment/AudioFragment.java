@@ -1,5 +1,6 @@
 package linorz.com.linorzmedia.main.fragment;
 
+import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import linorz.com.linorzmedia.main.AudioPlay;
 import linorz.com.linorzmedia.main.adapter.PlayAudio;
 import linorz.com.linorzmedia.main.adapter.AudioAdapter;
 import linorz.com.linorzmedia.mediatools.Audio;
@@ -22,6 +24,7 @@ public class AudioFragment extends MediaFragment {
     public ArrayList<Audio> audios;
     private PlayAudio playAudio;
     public int last_num = 0;
+    private AudioPlay audioPlay;
 
     private Handler handler = new Handler(new Handler.Callback() {
         @Override
@@ -39,13 +42,18 @@ public class AudioFragment extends MediaFragment {
         }
     });
 
-    public Audio getAudio(int i) {
-        if (i >= 0 && i < audios.size()) {
-            changeColor(last_num, false);
-            last_num = i;
-            changeColor(last_num, true);
-            return audios.get(i);
-        } else return null;
+    public AudioFragment() {
+        this.audioPlay = new AudioPlay();
+    }
+
+    public AudioPlay getAudioPlay() {
+        return audioPlay;
+    }
+
+    public void changeAudio(int i) {
+        changeColor(last_num, false);
+        last_num = i;
+        changeColor(last_num, true);
     }
 
     public void changeColor(int i, boolean isPlay) {
@@ -89,5 +97,7 @@ public class AudioFragment extends MediaFragment {
             items.add(map);
         }
         adapter.notifyDataSetChanged();
+        //设置数组
+        audioPlay.setAudios(audios);
     }
 }

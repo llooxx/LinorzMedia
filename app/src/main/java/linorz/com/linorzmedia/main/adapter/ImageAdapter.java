@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import linorz.com.linorzmedia.R;
+import linorz.com.linorzmedia.main.LinorzApplication;
 import linorz.com.linorzmedia.main.activity.MainActivity;
 import linorz.com.linorzmedia.media.MoreImagesActivity;
 import linorz.com.linorzmedia.media.ZoomImage;
@@ -55,7 +56,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageItem> {
         imageItem.path = (String) mapList.get(i).get("path");
         BitmapFactory.decodeFile(imageItem.path, options);
         setWH(imageItem.img, options.outWidth, options.outHeight);
-        ImageLoader.getInstance().displayImage("file://" + imageItem.path, imageItem.img, MainActivity.mOptions);
+        ImageLoader.getInstance().displayImage("file://" + imageItem.path, imageItem.img, LinorzApplication.getOptions());
         urls.add("file://" + imageItem.path);
 
 //        imageItem.img.setOnClickListener(new View.OnClickListener() {
