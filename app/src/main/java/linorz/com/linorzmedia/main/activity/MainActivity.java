@@ -3,8 +3,6 @@ package linorz.com.linorzmedia.main.activity;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -30,7 +28,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -41,7 +38,7 @@ import linorz.com.linorzmedia.customview.FloatingAction.FloatingActionMenu;
 import linorz.com.linorzmedia.customview.FloatingAction.animation.DefaultAnimationHandler;
 import linorz.com.linorzmedia.customview.MyPageTransformer;
 import linorz.com.linorzmedia.customview.RandomFloatView;
-import linorz.com.linorzmedia.main.AudioPlay;
+import linorz.com.linorzmedia.media.AudioPlay;
 import linorz.com.linorzmedia.main.service.LinorzService;
 import linorz.com.linorzmedia.main.adapter.PagerAdapter;
 import linorz.com.linorzmedia.main.adapter.PlayAudio;
@@ -350,16 +347,18 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
+        intent = new Intent(this, LinorzService.class);
+        startService(intent);
         super.onPause();
     }
 
     @Override
     protected void onResume() {
-        super.onResume();
-        if (intent != null) {
+        if (LinorzService.instance != null) {
+            intent = new Intent(this, LinorzService.class);
             stopService(intent);
-            finish();
         }
+        super.onResume();
     }
 
     @Override

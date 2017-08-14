@@ -1,6 +1,5 @@
 package linorz.com.linorzmedia.main.fragment;
 
-import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,7 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import linorz.com.linorzmedia.main.AudioPlay;
+import linorz.com.linorzmedia.media.AudioPlay;
 import linorz.com.linorzmedia.main.adapter.PlayAudio;
 import linorz.com.linorzmedia.main.adapter.AudioAdapter;
 import linorz.com.linorzmedia.mediatools.Audio;

@@ -8,10 +8,7 @@ import android.app.ActivityManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.graphics.PixelFormat;
-import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -23,19 +20,11 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import linorz.com.linorzmedia.R;
 import linorz.com.linorzmedia.customview.FloatingAction.FloatingActionMenu;
 import linorz.com.linorzmedia.customview.FloatingAction.animation.DefaultAnimationHandler;
 import linorz.com.linorzmedia.customview.ServiceFloatView;
-import linorz.com.linorzmedia.main.AudioPlay;
-import linorz.com.linorzmedia.main.activity.MainActivity;
-import linorz.com.linorzmedia.mediatools.Audio;
+import linorz.com.linorzmedia.media.AudioPlay;
 import linorz.com.linorzmedia.tools.StaticMethod;
 
 public class LinorzService extends Service {
@@ -45,8 +34,7 @@ public class LinorzService extends Service {
     private static ServiceFloatView rfv;
     private ImageView play_btn;
     private AudioPlay audioPlay;
-    private boolean isShowing = true;
-    private Timer timer;    // 定时器，定时进行检测当前应该创建还是移除悬浮窗。
+    public static LinorzService instance;
     private Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message message) {
@@ -56,17 +44,20 @@ public class LinorzService extends Service {
                     break;
                 case 2:
                     wm.removeView(rfv);
-                    isShowing = false;
                     break;
             }
             return false;
         }
     });
 
+    public void sendMessage(int what) {
+        instance.handler.sendMessage(Message.obtain(instance.handler, what));
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        instance = this;
         audioPlay = AudioPlay.instance;
         wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         wml = getDefaultSystemWindowParams(this, StaticMethod.dipTopx(this, 60));
@@ -76,23 +67,6 @@ public class LinorzService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // 开启定时器，每隔0.5秒刷新一次
-        if (timer == null) {
-            timer = new Timer();
-            timer.scheduleAtFixedRate(new TimerTask() {
-                @Override
-                public void run() {
-                    if (isHome() && !isWindowShowing()) {
-                        // 当前界面是桌面，且没有悬浮窗显示，则创建悬浮窗。
-                        handler.sendMessage(Message.obtain(handler, 1));
-                    } else if (!isHome() && isWindowShowing()) {
-                        // 当前界面不是桌面，且有悬浮窗显示，则移除悬浮窗。
-                        handler.sendMessage(Message.obtain(handler, 2));
-                    }
-
-                }
-            }, 0, 500);
-        }
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -101,12 +75,7 @@ public class LinorzService extends Service {
         return null;
     }
 
-    public boolean isWindowShowing() {
-        return isShowing;
-    }
-
     public void initButton() {
-        isShowing = true;
         rfv = new ServiceFloatView(this, 60, 60);
         rfv.setImageResource(R.drawable.current);
         rfv.setBackgroundResource(R.drawable.blue_circle);
@@ -236,37 +205,9 @@ public class LinorzService extends Service {
         return params;
     }
 
-    // 判断当前界面是否是桌面
-    @SuppressWarnings("deprecation")
-    private boolean isHome() {
-        ActivityManager mActivityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        List<ActivityManager.RunningTaskInfo> rti = mActivityManager.getRunningTasks(1);
-        return getHomes().contains(rti.get(0).topActivity.getPackageName());
-    }
-
-    /**
-     * 获得属于桌面的应用的应用包名称
-     *
-     * @return 返回包含所有包名的字符串列表
-     */
-    private List<String> getHomes() {
-        List<String> names = new ArrayList<String>();
-        PackageManager packageManager = this.getPackageManager();
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_HOME);
-        List<ResolveInfo> resolveInfo = packageManager.queryIntentActivities(intent,
-                PackageManager.MATCH_DEFAULT_ONLY);
-        for (ResolveInfo ri : resolveInfo) {
-            names.add(ri.activityInfo.packageName);
-        }
-        return names;
-    }
-
     @Override
     public void onDestroy() {
-        // Service被终止的同时也停止定时器继续运行
-        timer.cancel();
-        timer = null;
+        handler.sendMessage(Message.obtain(handler, 2));
         super.onDestroy();
     }
 }

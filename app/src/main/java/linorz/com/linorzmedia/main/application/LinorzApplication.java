@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.main;
+package linorz.com.linorzmedia.main.application;
 
 import android.app.Application;
 import android.content.Context;

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import linorz.com.linorzmedia.R;
-import linorz.com.linorzmedia.main.LinorzApplication;
-import linorz.com.linorzmedia.main.activity.MainActivity;
-import linorz.com.linorzmedia.media.MoreImagesActivity;
+import linorz.com.linorzmedia.main.application.LinorzApplication;
 import linorz.com.linorzmedia.media.ZoomImage;
 import linorz.com.linorzmedia.tools.StaticMethod;
 
