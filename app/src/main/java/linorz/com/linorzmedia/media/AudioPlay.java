@@ -23,6 +23,8 @@ public class AudioPlay {
     private SharedPreferences mySharedPreferences;
     private SharedPreferences.Editor editor;
     private Context context;
+    private MediaPlayer.OnCompletionListener onCompletionListener;
+
     public int current_num = 0;
     public static AudioPlay instance;
 
@@ -56,6 +58,10 @@ public class AudioPlay {
 
     public int getCurrentPosition() {
         return main_player.getCurrentPosition();
+    }
+
+    public ArrayList<Audio> getAudios() {
+        return audios;
     }
 
     //action
@@ -104,15 +110,8 @@ public class AudioPlay {
         if (play) {
             main_player.start();
         }
-        main_player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                //随机
-                current_num = (int) (audios.size() * Math.random());
-                Audio next_audio = getAudio(current_num);
-                setAudio(next_audio, true);
-            }
-        });
+        if (onCompletionListener != null)
+            main_player.setOnCompletionListener(onCompletionListener);
     }
 
     public boolean setAudio(int num, boolean play) {
@@ -121,5 +120,9 @@ public class AudioPlay {
         current_num = num;
         setAudio(audio, play);
         return true;
+    }
+
+    public void setAudioPlayAction(MediaPlayer.OnCompletionListener ocl) {
+        this.onCompletionListener = ocl;
     }
 }

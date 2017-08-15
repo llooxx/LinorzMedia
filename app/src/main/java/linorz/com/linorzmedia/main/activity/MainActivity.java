@@ -3,6 +3,7 @@ package linorz.com.linorzmedia.main.activity;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -90,6 +91,16 @@ public class MainActivity extends AppCompatActivity {
                 setAudio(audioPlay.current_num, false);
             }
         }, 500);
+
+        audioPlay = audioFragment.getAudioPlay();
+        audioPlay.setAudioPlayAction(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                //随机
+                audioPlay.current_num = (int) (audioPlay.getAudios().size() * Math.random());
+                setAudio(audioPlay.current_num, true);
+            }
+        });
     }
 
     private void initView() {
@@ -110,8 +121,6 @@ public class MainActivity extends AppCompatActivity {
         list.add(videoFragment);
         list.add(audioFragment);
         list.add(imageFragment);
-        audioPlay = audioFragment.getAudioPlay();
-
         list_title.add("video");
         list_title.add("audio");
         list_title.add("image");
@@ -347,8 +356,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        intent = new Intent(this, LinorzService.class);
-        startService(intent);
+//        intent = new Intent(this, LinorzService.class);
+//        startService(intent);
         super.onPause();
     }
 
