@@ -2,17 +2,27 @@ package linorz.com.linorzmedia.main.activity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,6 +34,7 @@ import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RemoteViews;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,6 +50,7 @@ import linorz.com.linorzmedia.customview.FloatingAction.FloatingActionMenu;
 import linorz.com.linorzmedia.customview.FloatingAction.animation.DefaultAnimationHandler;
 import linorz.com.linorzmedia.customview.MyPageTransformer;
 import linorz.com.linorzmedia.customview.RandomFloatView;
+import linorz.com.linorzmedia.main.service.AudioService;
 import linorz.com.linorzmedia.media.AudioPlay;
 import linorz.com.linorzmedia.main.service.LinorzService;
 import linorz.com.linorzmedia.main.adapter.PagerAdapter;
@@ -66,6 +78,16 @@ public class MainActivity extends AppCompatActivity {
     private AudioPlay audioPlay;
     private Intent intent;
 
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,16 +104,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initView();
         viewPager.setCurrentItem(1);
-
-        new Handler().postDelayed(new Runnable() {
-            public void run() {
-                initFab();//开线程时，已经绘制完成，能获得view的宽高
-//                audioPlay.init();
-                audioPlay.current_num = audioPlay.getLastAudioNum();
-                setAudio(audioPlay.current_num, false);
-            }
-        }, 500);
-
+        //音频播放工具获得
         audioPlay = audioFragment.getAudioPlay();
         audioPlay.setAudioPlayAction(new MediaPlayer.OnCompletionListener() {
             @Override
@@ -101,6 +114,18 @@ public class MainActivity extends AppCompatActivity {
                 setAudio(audioPlay.current_num, true);
             }
         });
+        //在onCreatView外进行
+        new Handler().postDelayed(new Runnable() {
+            public void run() {
+                initFab();//开线程时，已经绘制完成，能获得view的宽高
+                audioPlay.current_num = audioPlay.getLastAudioNum();
+                setAudio(audioPlay.current_num, false);
+
+                //开启通知栏控制器
+                intent = new Intent(MainActivity.this, AudioService.class);
+                bindService(intent, mServiceConnection, BIND_AUTO_CREATE);
+            }
+        }, 500);
     }
 
     private void initView() {

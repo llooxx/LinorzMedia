@@ -65,6 +65,7 @@
         <activity android:name=".media.MoreImagesActivity" />
 
         <service android:name=".main.service.LinorzService" />
+        <service android:name=".main.service.AudioService"/>
     </application>
 
 </manifest>

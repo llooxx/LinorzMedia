@@ -24,7 +24,8 @@ public class AudioPlay {
     private SharedPreferences.Editor editor;
     private Context context;
     private MediaPlayer.OnCompletionListener onCompletionListener;
-
+    //接口
+    private AudioServiceAciton asa;
     public int current_num = 0;
     public static AudioPlay instance;
 
@@ -76,10 +77,12 @@ public class AudioPlay {
 
     public void start() {
         if (main_player != null) main_player.start();
+        if (asa != null) asa.start();
     }
 
     public void pause() {
         if (main_player != null) main_player.pause();
+        if (asa != null) asa.pause();
     }
 
     public void stop() {
@@ -112,6 +115,7 @@ public class AudioPlay {
         }
         if (onCompletionListener != null)
             main_player.setOnCompletionListener(onCompletionListener);
+        if (asa != null) asa.changeAudio();
     }
 
     public boolean setAudio(int num, boolean play) {
@@ -124,5 +128,18 @@ public class AudioPlay {
 
     public void setAudioPlayAction(MediaPlayer.OnCompletionListener ocl) {
         this.onCompletionListener = ocl;
+    }
+
+
+    public void setAudioServiceAcion(AudioServiceAciton asa) {
+        this.asa = asa;
+    }
+
+    public interface AudioServiceAciton {
+        void start();
+
+        void pause();
+
+        void changeAudio();
     }
 }
