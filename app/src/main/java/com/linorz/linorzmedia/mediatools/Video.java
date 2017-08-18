@@ -9,6 +9,6 @@ public class Video extends Audio {
     public Video(int id, String title, String album, String artist,
                  String displayName, String mimeType, String path, long size,
                  long duration) {
-        super(id, title, album, artist, path, displayName, mimeType, duration, size);
+        super(id, -1, title, album, artist, path, displayName, mimeType, duration, size);
     }
 }

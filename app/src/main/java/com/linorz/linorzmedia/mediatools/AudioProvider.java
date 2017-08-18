@@ -24,6 +24,8 @@ public class AudioProvider extends AbstractProvider {
                 while (cursor.moveToNext()) {
                     int id = cursor.getInt(cursor
                             .getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
+                    int albumId = cursor
+                            .getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
                     String title = cursor.getString(cursor
                             .getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
                     String album = cursor.getString(cursor
@@ -40,7 +42,7 @@ public class AudioProvider extends AbstractProvider {
                             .getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION));
                     long size = cursor.getLong(cursor
                             .getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE));
-                    Audio audio = new Audio(id, title, album, artist, path,
+                    Audio audio = new Audio(id, albumId,title, album, artist, path,
                             displayName, mimeType, duration, size);
                     list.add(audio);
                 }

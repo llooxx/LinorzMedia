@@ -9,6 +9,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -72,12 +73,13 @@ public class MainActivity extends AppCompatActivity {
     private TextView audio_title, audio_author, audio_state;
     private ImageView play_btn;
     private SeekBar audio_seekbar;
-    private Timer t;
-    private TimerTask tt;
-    private RotateAnimation animation;
-    private AudioPlay audioPlay;
-    private AudioPlay.AudioListener audioListener;
-    private Intent intent;
+    private Timer t;//滑动条监听
+    private TimerTask tt;//滑动条监听
+    private RotateAnimation animation;//旋转动画
+    private AudioPlay audioPlay;//播放器控制
+    private AudioPlay.AudioListener audioListener;//播放状态监听
+    private Intent intent;//跳转意图
+    private Bitmap bitmap;//封面
 
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
@@ -103,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         setContentView(R.layout.activity_main);
+        final ImageView imageView = (ImageView) findViewById(R.id.main_audio_img);
         initView();
         viewPager.setCurrentItem(1);
         //音频播放工具获得
@@ -143,6 +146,12 @@ public class MainActivity extends AppCompatActivity {
                     audio_state.setText("已暂停");
                     play_btn.setImageResource(R.drawable.btn_play_white);
                 }
+                if (bitmap != null) bitmap.recycle();
+                bitmap = audio.getArtwork(MainActivity.this);
+                if (bitmap != null)
+                    imageView.setImageBitmap(bitmap);
+                else
+                    imageView.setImageResource(R.drawable.current);
                 setVideoTimeTask();
             }
         };

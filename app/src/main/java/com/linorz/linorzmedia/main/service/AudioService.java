@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 import com.linorz.linorzmedia.R;
 import com.linorz.linorzmedia.main.activity.MainActivity;
 import com.linorz.linorzmedia.media.AudioPlay;
+import com.linorz.linorzmedia.mediatools.Audio;
 
 /**
  * Created by linorz on 2017/8/18.
@@ -32,15 +34,22 @@ public class AudioService extends Service {
     private NotificationManager notifyManager;
     private Notification notification;
     private RemoteViews remoteViews;
-    private AudioPlay audioPlay;
-    private AudioPlay.AudioListener audioListener;
+    private AudioPlay audioPlay;//播放器控制
+    private AudioPlay.AudioListener audioListener;//播放状态监听
+    private Bitmap bitmap;//封面
 
     private Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message message) {
             switch (message.what) {
                 case 1:
-                    remoteViews.setTextViewText(R.id.notification_name, audioPlay.getCurrentAudio().getTitle());
+                    Audio audio = audioPlay.getCurrentAudio();
+                    bitmap = audio.getArtwork(AudioService.this);
+                    if (bitmap != null)
+                        remoteViews.setImageViewBitmap(R.id.notification_icon, bitmap);
+                    else
+                        remoteViews.setImageViewResource(R.id.notification_icon, R.drawable.current);
+                    remoteViews.setTextViewText(R.id.notification_name, audio.getTitle());
                     notifyManager.notify(233, notification);
                     break;
                 case 2:

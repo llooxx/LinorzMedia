@@ -102,9 +102,7 @@ public class LinorzRecyclerView extends RecyclerView {
 
                 if (dy > 0 && !isLoading) {
                     int lastVisiblePosition = getLastVisiblePosition();
-                    System.out.println(lastVisiblePosition + "/" + adapter.getItemCount());
                     if (lastVisiblePosition == adapter.getItemCount()) {
-                        System.out.println("加载" + dy);
                         isLoading = true;
                         mLoadMore.loadMore();
                     }
