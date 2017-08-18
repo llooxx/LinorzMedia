@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.main.fragment;
+package com.linorz.linorzmedia.main.fragment;
 
 import android.os.Handler;
 import android.os.Message;
@@ -9,12 +9,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import linorz.com.linorzmedia.media.AudioPlay;
-import linorz.com.linorzmedia.main.adapter.PlayAudio;
-import linorz.com.linorzmedia.main.adapter.AudioAdapter;
-import linorz.com.linorzmedia.mediatools.Audio;
-import linorz.com.linorzmedia.mediatools.AudioProvider;
-import linorz.com.linorzmedia.tools.StaticMethod;
+import com.linorz.linorzmedia.media.AudioPlay;
+import com.linorz.linorzmedia.main.adapter.PlayAudio;
+import com.linorz.linorzmedia.main.adapter.AudioAdapter;
+import com.linorz.linorzmedia.mediatools.Audio;
+import com.linorz.linorzmedia.mediatools.AudioProvider;
+import com.linorz.linorzmedia.tools.StaticMethod;
 
 /**
  * Created by linorz on 2016/5/5.

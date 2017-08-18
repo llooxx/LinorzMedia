@@ -70,7 +70,7 @@
                 android:layout_marginRight="15dp"
                 android:orientation="horizontal">
 
-                <linorz.com.linorzmedia.customview.HorizontalScrollTextView
+                <com.linorz.linorzmedia.customview.HorizontalScrollTextView
                     android:id="@+id/main_audio_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

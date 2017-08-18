@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.mediatools;
+package com.linorz.linorzmedia.mediatools;
 
 public class Video extends Audio {
     //视频类继承音频类

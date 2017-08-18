@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.mediatools;
+package com.linorz.linorzmedia.mediatools;
 
 import android.content.Context;
 

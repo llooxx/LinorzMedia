@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.media;
+package com.linorz.linorzmedia.media;
 
 import android.app.Activity;
 import android.content.Context;
@@ -18,8 +18,8 @@ import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
 import java.util.ArrayList;
 
-import linorz.com.linorzmedia.R;
-import linorz.com.linorzmedia.customview.CustomSurfaceView;
+import com.linorz.linorzmedia.R;
+import com.linorz.linorzmedia.customview.CustomSurfaceView;
 
 /**
  * Created by linorz on 2016/5/31.

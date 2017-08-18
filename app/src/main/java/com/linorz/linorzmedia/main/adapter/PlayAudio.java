@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.main.adapter;
+package com.linorz.linorzmedia.main.adapter;
 
 /**
  * Created by linorz on 2016/5/16.

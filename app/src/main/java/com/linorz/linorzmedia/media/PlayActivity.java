@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.media;
+package com.linorz.linorzmedia.media;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -30,10 +30,10 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import linorz.com.linorzmedia.R;
-import linorz.com.linorzmedia.tools.BrightTools;
-import linorz.com.linorzmedia.tools.ScreenObserver;
-import linorz.com.linorzmedia.tools.StaticMethod;
+import com.linorz.linorzmedia.R;
+import com.linorz.linorzmedia.tools.BrightTools;
+import com.linorz.linorzmedia.tools.ScreenObserver;
+import com.linorz.linorzmedia.tools.StaticMethod;
 
 /**
  * Created by linorz on 2016/5/2.

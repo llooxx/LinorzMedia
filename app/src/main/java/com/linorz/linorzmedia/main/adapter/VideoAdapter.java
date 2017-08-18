@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.main.adapter;
+package com.linorz.linorzmedia.main.adapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,9 +13,9 @@ import android.widget.TextView;
 import java.util.List;
 import java.util.Map;
 
-import linorz.com.linorzmedia.R;
-import linorz.com.linorzmedia.media.PlayActivity;
-import linorz.com.linorzmedia.tools.StaticMethod;
+import com.linorz.linorzmedia.R;
+import com.linorz.linorzmedia.media.PlayActivity;
+import com.linorz.linorzmedia.tools.StaticMethod;
 
 /**
  * Created by linorz on 2016/5/3.

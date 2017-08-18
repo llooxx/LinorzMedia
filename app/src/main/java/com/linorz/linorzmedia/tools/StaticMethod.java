@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.tools;
+package com.linorz.linorzmedia.tools;
 
 import android.annotation.TargetApi;
 import android.app.Activity;

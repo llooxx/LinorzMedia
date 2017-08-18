@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.main.service;
+package com.linorz.linorzmedia.main.service;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -14,9 +14,9 @@ import android.support.v7.app.NotificationCompat;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
-import linorz.com.linorzmedia.R;
-import linorz.com.linorzmedia.main.activity.MainActivity;
-import linorz.com.linorzmedia.media.AudioPlay;
+import com.linorz.linorzmedia.R;
+import com.linorz.linorzmedia.main.activity.MainActivity;
+import com.linorz.linorzmedia.media.AudioPlay;
 
 /**
  * Created by linorz on 2017/8/18.

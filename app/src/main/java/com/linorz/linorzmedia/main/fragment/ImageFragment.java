@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.main.fragment;
+package com.linorz.linorzmedia.main.fragment;
 
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import linorz.com.linorzmedia.main.adapter.ImageAdapter;
-import linorz.com.linorzmedia.mediatools.Image;
-import linorz.com.linorzmedia.mediatools.ImageProvider;
+import com.linorz.linorzmedia.main.adapter.ImageAdapter;
+import com.linorz.linorzmedia.mediatools.Image;
+import com.linorz.linorzmedia.mediatools.ImageProvider;
 
 /**
  * Created by linorz on 2016/5/8.

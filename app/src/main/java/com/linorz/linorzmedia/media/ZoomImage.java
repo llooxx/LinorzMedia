@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.media;
+package com.linorz.linorzmedia.media;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -7,9 +7,9 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 
-import linorz.com.linorzmedia.R;
-import linorz.com.linorzmedia.customview.CustomSurfaceView;
-import linorz.com.linorzmedia.tools.StaticMethod;
+import com.linorz.linorzmedia.R;
+import com.linorz.linorzmedia.customview.CustomSurfaceView;
+import com.linorz.linorzmedia.tools.StaticMethod;
 
 /**
  * Created by linorz on 2016/4/3.

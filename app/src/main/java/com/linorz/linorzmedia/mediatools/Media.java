@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.mediatools;
+package com.linorz.linorzmedia.mediatools;
 
 /**
  * Created by linorz on 2016/5/10.

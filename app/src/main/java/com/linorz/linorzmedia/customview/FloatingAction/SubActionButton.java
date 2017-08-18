@@ -1,7 +1,7 @@
 /*
  *   Copyright 2014 Oguz Bilgener
  */
-package linorz.com.linorzmedia.customview.FloatingAction;
+package com.linorz.linorzmedia.customview.FloatingAction;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -10,7 +10,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import linorz.com.linorzmedia.R;
+import com.linorz.linorzmedia.R;
 
 
 public class SubActionButton extends FrameLayout {

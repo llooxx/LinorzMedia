@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.main.adapter;
+package com.linorz.linorzmedia.main.adapter;
 
 import android.app.Activity;
 import android.content.Context;
@@ -16,10 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import linorz.com.linorzmedia.R;
-import linorz.com.linorzmedia.main.application.LinorzApplication;
-import linorz.com.linorzmedia.media.ZoomImage;
-import linorz.com.linorzmedia.tools.StaticMethod;
+import com.linorz.linorzmedia.R;
+import com.linorz.linorzmedia.main.application.LinorzApplication;
+import com.linorz.linorzmedia.media.ZoomImage;
+import com.linorz.linorzmedia.tools.StaticMethod;
 
 /**
  * Created by linorz on 2016/5/8.

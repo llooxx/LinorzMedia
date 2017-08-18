@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="@color/black">
 
-    <linorz.com.linorzmedia.customview.CustomSurfaceView
+    <com.linorz.linorzmedia.customview.CustomSurfaceView
         android:id="@+id/zoom_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

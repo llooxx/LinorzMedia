@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.media;
+package com.linorz.linorzmedia.media;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -9,8 +9,8 @@ import android.media.MediaPlayer;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import linorz.com.linorzmedia.main.application.LinorzApplication;
-import linorz.com.linorzmedia.mediatools.Audio;
+import com.linorz.linorzmedia.main.application.LinorzApplication;
+import com.linorz.linorzmedia.mediatools.Audio;
 
 /**
  * Created by linorz on 2017/8/14.

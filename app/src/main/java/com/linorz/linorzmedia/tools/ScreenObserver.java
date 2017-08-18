@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.tools;
+package com.linorz.linorzmedia.tools;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;

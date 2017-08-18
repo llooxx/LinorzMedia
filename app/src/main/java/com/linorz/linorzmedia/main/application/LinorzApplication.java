@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.main.application;
+package com.linorz.linorzmedia.main.application;
 
 import android.app.Application;
 import android.content.Context;
@@ -11,7 +11,7 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 
 
-import linorz.com.linorzmedia.R;
+import com.linorz.linorzmedia.R;
 
 /**
  * Created by linorz on 2016/7/13.

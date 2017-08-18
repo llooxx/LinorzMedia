@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.main.adapter;
+package com.linorz.linorzmedia.main.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -10,7 +10,7 @@ import android.widget.TextView;
 import java.util.List;
 import java.util.Map;
 
-import linorz.com.linorzmedia.R;
+import com.linorz.linorzmedia.R;
 
 /**
  * Created by linorz on 2016/5/5.

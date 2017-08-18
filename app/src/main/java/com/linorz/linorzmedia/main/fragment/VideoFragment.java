@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.main.fragment;
+package com.linorz.linorzmedia.main.fragment;
 
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -7,11 +7,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import linorz.com.linorzmedia.main.adapter.PlayAudio;
-import linorz.com.linorzmedia.main.adapter.VideoAdapter;
-import linorz.com.linorzmedia.tools.StaticMethod;
-import linorz.com.linorzmedia.mediatools.Video;
-import linorz.com.linorzmedia.mediatools.VideoProvider;
+import com.linorz.linorzmedia.main.adapter.PlayAudio;
+import com.linorz.linorzmedia.main.adapter.VideoAdapter;
+import com.linorz.linorzmedia.tools.StaticMethod;
+import com.linorz.linorzmedia.mediatools.Video;
+import com.linorz.linorzmedia.mediatools.VideoProvider;
 
 /**
  * Created by linorz on 2016/5/5.

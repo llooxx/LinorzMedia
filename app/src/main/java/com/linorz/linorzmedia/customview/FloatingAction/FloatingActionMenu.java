@@ -1,7 +1,7 @@
 /*
  *   Copyright 2014 Oguz Bilgener
  */
-package linorz.com.linorzmedia.customview.FloatingAction;
+package com.linorz.linorzmedia.customview.FloatingAction;
 
 /*
  *   Copyright 2014 Oguz Bilgener
@@ -28,9 +28,9 @@ import android.widget.FrameLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-import linorz.com.linorzmedia.R;
-import linorz.com.linorzmedia.customview.FloatingAction.animation.DefaultAnimationHandler;
-import linorz.com.linorzmedia.customview.FloatingAction.animation.MenuAnimationHandler;
+import com.linorz.linorzmedia.R;
+import com.linorz.linorzmedia.customview.FloatingAction.animation.DefaultAnimationHandler;
+import com.linorz.linorzmedia.customview.FloatingAction.animation.MenuAnimationHandler;
 
 /**
  * Provides the main structure of the menu.

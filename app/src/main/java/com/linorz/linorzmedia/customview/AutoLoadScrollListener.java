@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.customview;
+package com.linorz.linorzmedia.customview;
 
 import android.support.v7.widget.RecyclerView;
 

@@ -1,7 +1,7 @@
 /*
  *   Copyright 2014 Oguz Bilgener
  */
-package linorz.com.linorzmedia.customview.FloatingAction.animation;
+package com.linorz.linorzmedia.customview.FloatingAction.animation;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 
-import linorz.com.linorzmedia.customview.FloatingAction.FloatingActionMenu;
+import com.linorz.linorzmedia.customview.FloatingAction.FloatingActionMenu;
 
 /**
  * An example animation handler

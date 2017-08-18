@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.main.activity;
+package com.linorz.linorzmedia.main.activity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -45,23 +45,23 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import linorz.com.linorzmedia.R;
-import linorz.com.linorzmedia.customview.FloatingAction.FloatingActionMenu;
-import linorz.com.linorzmedia.customview.FloatingAction.animation.DefaultAnimationHandler;
-import linorz.com.linorzmedia.customview.MyPageTransformer;
-import linorz.com.linorzmedia.customview.RandomFloatView;
-import linorz.com.linorzmedia.main.service.AudioService;
-import linorz.com.linorzmedia.media.AudioPlay;
-import linorz.com.linorzmedia.main.service.LinorzService;
-import linorz.com.linorzmedia.main.adapter.PagerAdapter;
-import linorz.com.linorzmedia.main.adapter.PlayAudio;
-import linorz.com.linorzmedia.main.fragment.AudioFragment;
-import linorz.com.linorzmedia.main.fragment.ImageFragment;
-import linorz.com.linorzmedia.main.fragment.MediaFragment;
-import linorz.com.linorzmedia.main.fragment.VideoFragment;
-import linorz.com.linorzmedia.media.PlayActivity;
-import linorz.com.linorzmedia.mediatools.Audio;
-import linorz.com.linorzmedia.tools.StaticMethod;
+import com.linorz.linorzmedia.R;
+import com.linorz.linorzmedia.customview.FloatingAction.FloatingActionMenu;
+import com.linorz.linorzmedia.customview.FloatingAction.animation.DefaultAnimationHandler;
+import com.linorz.linorzmedia.customview.MyPageTransformer;
+import com.linorz.linorzmedia.customview.RandomFloatView;
+import com.linorz.linorzmedia.main.service.AudioService;
+import com.linorz.linorzmedia.media.AudioPlay;
+import com.linorz.linorzmedia.main.service.LinorzService;
+import com.linorz.linorzmedia.main.adapter.PagerAdapter;
+import com.linorz.linorzmedia.main.adapter.PlayAudio;
+import com.linorz.linorzmedia.main.fragment.AudioFragment;
+import com.linorz.linorzmedia.main.fragment.ImageFragment;
+import com.linorz.linorzmedia.main.fragment.MediaFragment;
+import com.linorz.linorzmedia.main.fragment.VideoFragment;
+import com.linorz.linorzmedia.media.PlayActivity;
+import com.linorz.linorzmedia.mediatools.Audio;
+import com.linorz.linorzmedia.tools.StaticMethod;
 
 public class MainActivity extends AppCompatActivity {
     private ViewPager viewPager;

@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.main.fragment;
+package com.linorz.linorzmedia.main.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import linorz.com.linorzmedia.R;
-import linorz.com.linorzmedia.customview.LinorzRecyclerView;
+import com.linorz.linorzmedia.R;
+import com.linorz.linorzmedia.customview.LinorzRecyclerView;
 
 /**
  * Created by linorz on 2016/5/9.

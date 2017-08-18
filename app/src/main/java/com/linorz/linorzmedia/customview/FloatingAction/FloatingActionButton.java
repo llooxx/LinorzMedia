@@ -1,7 +1,7 @@
 /*
  *   Copyright 2014 Oguz Bilgener
  */
-package linorz.com.linorzmedia.customview.FloatingAction;
+package com.linorz.linorzmedia.customview.FloatingAction;
 
 import android.app.Activity;
 import android.content.Context;
@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
-import linorz.com.linorzmedia.R;
+import com.linorz.linorzmedia.R;
 
 
 /**

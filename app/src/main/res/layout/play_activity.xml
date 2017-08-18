@@ -102,7 +102,7 @@
                 android:layout_marginBottom="10dp"
                 android:src="@drawable/sun" />
 
-            <linorz.com.linorzmedia.customview.VerticalSeekBar
+            <com.linorz.linorzmedia.customview.VerticalSeekBar
                 android:id="@+id/screen_seekbar"
                 style="@style/Widget.SeekBar.Normal"
                 android:layout_width="10dp"
@@ -126,7 +126,7 @@
                 android:layout_marginBottom="10dp"
                 android:src="@drawable/voice" />
 
-            <linorz.com.linorzmedia.customview.VerticalSeekBar
+            <com.linorz.linorzmedia.customview.VerticalSeekBar
                 android:id="@+id/voice_seekbar"
                 style="@style/Widget.SeekBar.Normal"
                 android:layout_width="10dp"

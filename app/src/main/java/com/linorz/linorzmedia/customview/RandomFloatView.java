@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.customview;
+package com.linorz.linorzmedia.customview;
 
 import java.util.Timer;
 import java.util.TimerTask;

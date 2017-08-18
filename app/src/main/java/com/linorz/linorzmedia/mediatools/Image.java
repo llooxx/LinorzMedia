@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.mediatools;
+package com.linorz.linorzmedia.mediatools;
 
 public class Image extends Media {
     //图片继承媒体类

@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.customview;
+package com.linorz.linorzmedia.customview;
 
 /**
  * Created by linorz on 2017/7/27.

@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.main.adapter;
+package com.linorz.linorzmedia.main.adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
-import linorz.com.linorzmedia.main.fragment.MediaFragment;
+import com.linorz.linorzmedia.main.fragment.MediaFragment;
 
 /**
  * Created by LLX on 2015/10/28.

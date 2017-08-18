@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.customview;
+package com.linorz.linorzmedia.customview;
 
 import android.content.Context;
 import android.util.AttributeSet;

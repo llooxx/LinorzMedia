@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.main.service;
+package com.linorz.linorzmedia.main.service;
 
 /**
  * Created by linorz on 2017/7/27.
@@ -20,12 +20,12 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import linorz.com.linorzmedia.R;
-import linorz.com.linorzmedia.customview.FloatingAction.FloatingActionMenu;
-import linorz.com.linorzmedia.customview.FloatingAction.animation.DefaultAnimationHandler;
-import linorz.com.linorzmedia.customview.ServiceFloatView;
-import linorz.com.linorzmedia.media.AudioPlay;
-import linorz.com.linorzmedia.tools.StaticMethod;
+import com.linorz.linorzmedia.R;
+import com.linorz.linorzmedia.customview.FloatingAction.FloatingActionMenu;
+import com.linorz.linorzmedia.customview.FloatingAction.animation.DefaultAnimationHandler;
+import com.linorz.linorzmedia.customview.ServiceFloatView;
+import com.linorz.linorzmedia.media.AudioPlay;
+import com.linorz.linorzmedia.tools.StaticMethod;
 
 public class LinorzService extends Service {
     private WindowManager.LayoutParams wml;

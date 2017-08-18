@@ -1,4 +1,4 @@
-package linorz.com.linorzmedia.customview.FloatingAction;
+package com.linorz.linorzmedia.customview.FloatingAction;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
@@ -9,8 +9,8 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 
-import linorz.com.linorzmedia.customview.FloatingAction.FloatingActionMenu;
-import linorz.com.linorzmedia.customview.FloatingAction.animation.MenuAnimationHandler;
+import com.linorz.linorzmedia.customview.FloatingAction.FloatingActionMenu;
+import com.linorz.linorzmedia.customview.FloatingAction.animation.MenuAnimationHandler;
 
 /**
  * Created by oguzbilgener on 23/07/14.
