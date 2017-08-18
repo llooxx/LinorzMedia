@@ -39,9 +39,9 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoItem> {
 
     @Override
     public void onBindViewHolder(VideoItem videoItem, int i) {
-        Bitmap bitmap = (Bitmap) mapList.get(i).get("img");
-        if (bitmap != null)
-            videoItem.img.setImageBitmap(bitmap);
+        Object object = mapList.get(i).get("img");
+        if (object != null)
+            videoItem.img.setImageBitmap((Bitmap) object);
         videoItem.name.setText((String) mapList.get(i).get("name"));
         videoItem.time.setText((String) mapList.get(i).get("time"));
         videoItem.path = (String) mapList.get(i).get("path");

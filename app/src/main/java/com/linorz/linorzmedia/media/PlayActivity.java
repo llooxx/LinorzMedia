@@ -44,66 +44,62 @@ public class PlayActivity extends Activity {
     private SurfaceView surface;
     private SurfaceHolder surfaceHolder;
     private MediaPlayer mediaPlayer;
-    private Button play_btn, start_pause_btn, left_btn, right_btn;
+    private Button play_btn, start_pause_btn;
     private ImageView lock_btn, unlock_btn;
-    private SeekBar seekBar, voiceBar, screenBar;
-    private TextView currentTime_tv;
-    private TextView time_tv;
-    private TextView selectTime_tv;
-    private ViewGroup layout_top;
-    private ViewGroup layout_bottom;
-    private ViewGroup voice_layout;
-    private ViewGroup screen_layout;
+    private SeekBar seekBar, volumeBar, brightnessBar;
+    private TextView currentTime_tv, time_tv, selectTime_tv;
+    private ViewGroup layout_top, layout_bottom, volume_layout, brightness_layout;
     private Timer t;
     private TimerTask tt;
-    //视频各参数
-    int videolength = 0, screenWidth = 0, screenHeight = 0;
-    boolean isChanging = false;//互斥变量，防止定时器与SeekBar拖动时进度冲突
-    boolean canDealUp = true;//是否能处理手指抬起事件
-    boolean isScreenBarShow = false, isVoiceBarShow = false, isSeekBarShow = false;//seekbar的显示状况
-    boolean isHMoving = false;//是否横向移动
-    boolean isLock = false;//是否锁屏
-    int dealUpCount = 0;//处理手指抬起的次数
+
     String path;//文件路径
-    int type;//视频或者音乐
+    int videolength = 0, screenWidth = 0, screenHeight = 0//视频各参数
+            , type;//视频或者音乐
+    final int SEEKTO = 1, VOLUME_SHOW = 2, BRIGHTNESS_SHOW = 3, VOLUME_HIDE = 4,
+            BRIGHTNESS_HIDE = 5, ALL_HIDE = 6, LOCK_HIDE = 7;//一些参数
+    boolean isChanging = false//互斥变量，防止定时器与SeekBar拖动时进度冲突
+            , isBrightnessBarShow = false, isVolumeBarShow = false, isSeekBarShow = false//seekbar的显示状况
+            , isHMoving = false//是否横向移动
+            , isLock = false;//是否锁屏
+    long lockTime = 0//最后一次点击锁屏的时间
+            , fingerUpTime = 0;//最后一次手指抬起的时间
+
 
     private Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message message) {
             switch (message.what) {
-                case 1:
+                case SEEKTO:
+                    //进度跳转
                     mediaPlayer.seekTo((int) message.obj);
                     break;
-                case 2:
-                    mediaPlayer.seekTo((int) message.obj);
-                    if (isChanging) seekBar.setProgress((int) message.obj);
+                case VOLUME_SHOW:
+                    //音量调节滑动条显示
+                    volume_layout.setVisibility(View.VISIBLE);
+                    volumeBar.setProgress((int) message.obj);
                     break;
-                case 3:
-                    voice_layout.setVisibility(View.VISIBLE);
-                    voiceBar.setProgress((int) message.obj);
+                case BRIGHTNESS_SHOW:
+                    //屏幕亮度滑动条显示
+                    brightness_layout.setVisibility(View.VISIBLE);
+                    brightnessBar.setProgress((int) message.obj);
                     break;
-                case 4:
-                    screen_layout.setVisibility(View.VISIBLE);
-                    screenBar.setProgress((int) message.obj);
+                case VOLUME_HIDE:
+                    //音量调节滑动条隐藏
+                    volume_layout.setVisibility(View.INVISIBLE);
                     break;
-                case 5:
-                    System.out.println("!!!!" + dealUpCount + canDealUp);
-                    if (!isChanging & dealUpCount == 1 | dealUpCount-- == 1 & canDealUp)
+                case BRIGHTNESS_HIDE:
+                    //屏幕亮度滑动条显示
+                    brightness_layout.setVisibility(View.INVISIBLE);
+                    break;
+                case ALL_HIDE:
+                    //整体操作面板隐藏
+                    if (!isChanging && isSeekBarShow && System.currentTimeMillis() >= fingerUpTime + 4000)
                         setAllVisible(false);
-                    if (dealUpCount == 1) canDealUp = true;
                     break;
-                case 6:
-                    voice_layout.setVisibility(View.INVISIBLE);
-                    break;
-                case 7:
-                    screen_layout.setVisibility(View.INVISIBLE);
-                    break;
-                case 8:
-                    canDealUp = true;
-                    setAllVisible(false);
-                    break;
-                case 9:
-                    unlock_btn.setVisibility(View.INVISIBLE);
+                case LOCK_HIDE:
+                    //锁定按钮隐藏
+                    if (System.currentTimeMillis() >= lockTime + 3000)
+                        unlock_btn.setVisibility(View.INVISIBLE);
                     break;
             }
             return false;
@@ -120,86 +116,31 @@ public class PlayActivity extends Activity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         StaticMethod.hideBottomUIMenu(this);
         setContentView(R.layout.play_activity);
-
+        layout_top = (ViewGroup) findViewById(R.id.layout_top);
+        layout_bottom = (ViewGroup) findViewById(R.id.layout_bottom);
+        volume_layout = (ViewGroup) findViewById(R.id.voice_layout);
+        brightness_layout = (ViewGroup) findViewById(R.id.screen_layout);
+        play_btn = (Button) findViewById(R.id.video_btn_play);
+        start_pause_btn = (Button) findViewById(R.id.start_pause_btn);
+        lock_btn = (ImageView) findViewById(R.id.lock_screen_btn);
+        unlock_btn = (ImageView) findViewById(R.id.unlock_screen_btn);
+        selectTime_tv = (TextView) findViewById(R.id.select_time);
+        volumeBar = (SeekBar) findViewById(R.id.voice_seekbar);
+        brightnessBar = (SeekBar) findViewById(R.id.screen_seekbar);
+        TextView title_tv = (TextView) findViewById(R.id.top_title);
         seekBar = (SeekBar) findViewById(R.id.seekbar);
         currentTime_tv = (TextView) findViewById(R.id.currenttime);
         time_tv = (TextView) findViewById(R.id.time);
         surface = (SurfaceView) findViewById(R.id.surfaceview);
         surfaceHolder = surface.getHolder();//SurfaceHolder是SurfaceView的控制接口
         surfaceHolder.setFixedSize(320, 220);//显示的分辨率,不设置为视频默认
-        layout_top = (ViewGroup) findViewById(R.id.layout_top);
-        layout_bottom = (ViewGroup) findViewById(R.id.layout_bottom);
-        voice_layout = (ViewGroup) findViewById(R.id.voice_layout);
-        screen_layout = (ViewGroup) findViewById(R.id.screen_layout);
-        play_btn = (Button) findViewById(R.id.video_btn_play);
-        start_pause_btn = (Button) findViewById(R.id.start_pause_btn);
-        left_btn = (Button) findViewById(R.id.left_btn);
-        right_btn = (Button) findViewById(R.id.right_btn);
-        ImageView changeScreen = (ImageView) findViewById(R.id.change_screen_btn);
-        lock_btn = (ImageView) findViewById(R.id.lock_screen_btn);
-        unlock_btn = (ImageView) findViewById(R.id.unlock_screen_btn);
-        selectTime_tv = (TextView) findViewById(R.id.select_time);
-        TextView title_tv = (TextView) findViewById(R.id.top_title);
-        voiceBar = (SeekBar) findViewById(R.id.voice_seekbar);
-        screenBar = (SeekBar) findViewById(R.id.screen_seekbar);
 
         screenWidth = getWindowManager().getDefaultDisplay().getWidth();
         screenHeight = getWindowManager().getDefaultDisplay().getHeight();
         System.out.println("!!!3:" + screenWidth + "/" + screenHeight);
-        voiceBar.setMax(StaticMethod.getMaxVolume(this));
-        voiceBar.setProgress(StaticMethod.getCurrentVolume(this));
-        screenBar.setMax(BrightTools.getMaxScreenBrightness());
-        screenBar.setProgress(BrightTools.getScreenBrightness(this));
 
-        voiceBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                StaticMethod.setVolume(PlayActivity.this, seekBar.getProgress());
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-        screenBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                BrightTools.setBrightness(PlayActivity.this, seekBar.getProgress());
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-        changeScreen.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                StaticMethod.currentDuration = seekBar.getProgress();
-                System.out.println("!!!!!1:" + StaticMethod.currentDuration);
-                t.cancel();
-                tt.cancel();
-                if (StaticMethod.mScreen)
-                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-                else setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-                StaticMethod.mScreen = !StaticMethod.mScreen;
-            }
-        });
-        setScreenListener();//屏幕状态监听器
         if (path != null) dealPath(type, path);
         Intent intent = getIntent();
-
         path = intent.getStringExtra("path");
         if (path != null) {
             int start = path.lastIndexOf("/");
@@ -222,46 +163,11 @@ public class PlayActivity extends Activity {
 
     private void dealPath(int requestCode, String file) {
         setMedia(requestCode, file);
-        setSeekListener(seekBar);
-        mGesture = new GestureDetector(this, new MyGestureDetector());
-        View.OnClickListener startOrPause = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mediaPlayer.isPlaying()) videoPause();
-                else videoStart();
-            }
-        };
-        play_btn.setOnClickListener(startOrPause);
-        start_pause_btn.setOnClickListener(startOrPause);
-        left_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mediaPlayer != null && mediaPlayer.getCurrentPosition() >= 5000)
-                    mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() - 5000);
-            }
-        });
-        right_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mediaPlayer != null && mediaPlayer.getCurrentPosition() <= videolength - 5000)
-                    mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() + 5000);
-            }
-        });
-        lock_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                isLock = true;
-                setAllVisible(false);
-            }
-        });
-        unlock_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                isLock = false;
-                setAllVisible(true);
-                unlock_btn.setVisibility(View.INVISIBLE);
-            }
-        });
+        setSeekListener();//进度条监听器
+        setButtonListener();//按钮监听器
+        setVolumeBrightnessListener();//声音亮度监听器
+        setScreenListener();//屏幕状态监听器
+        mGesture = new GestureDetector(this, new MyGestureDetector());//手势操作
     }
 
     private void setMedia(int media_select, final String filepath) {
@@ -315,7 +221,8 @@ public class PlayActivity extends Activity {
     public boolean onTouchEvent(MotionEvent event) {
         if (isLock) {
             unlock_btn.setVisibility(View.VISIBLE);
-            handler.sendMessageDelayed(Message.obtain(handler, 9), 3000);
+            lockTime = System.currentTimeMillis();
+            handler.sendMessageDelayed(Message.obtain(handler, LOCK_HIDE), 3000);
             return true;
         }
         boolean result = mGesture.onTouchEvent(event);
@@ -330,12 +237,13 @@ public class PlayActivity extends Activity {
                     isChanging = false;
                 }
                 if (isSeekBarShow) {
-                    dealUpCount++;
-                    canDealUp = false;
-                    handler.sendMessageDelayed(Message.obtain(handler, 5), 4000);
+                    fingerUpTime = System.currentTimeMillis();
+                    handler.sendMessageDelayed(Message.obtain(handler, ALL_HIDE), 4000);
                 }
-                if (isVoiceBarShow) handler.sendMessageDelayed(Message.obtain(handler, 6), 500);
-                if (isScreenBarShow) handler.sendMessageDelayed(Message.obtain(handler, 7), 500);
+                if (isVolumeBarShow)
+                    handler.sendMessageDelayed(Message.obtain(handler, VOLUME_HIDE), 500);
+                if (isBrightnessBarShow)
+                    handler.sendMessageDelayed(Message.obtain(handler, BRIGHTNESS_HIDE), 500);
                 break;
             default:
                 break;
@@ -364,42 +272,6 @@ public class PlayActivity extends Activity {
             }
         };
         t.schedule(tt, 0, 10);
-    }
-
-    private void setSeekListener(SeekBar sb) {
-        sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            int count = 0;
-
-            @Override
-            public void onProgressChanged(final SeekBar seekBar, int i, boolean b) {
-                int currentTime = seekBar.getProgress();
-                String time = StaticMethod.getMusicTime(seekBar.getProgress());
-                currentTime_tv.setText(time);
-                selectTime_tv.setText(time);
-                if (isChanging && ++count >= 5) {
-                    Message.obtain(handler, 1, currentTime).sendToTarget();
-                    count = 0;
-                }
-
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-                selectTime_tv.setVisibility(View.VISIBLE);
-                mediaPlayer.pause();
-                isChanging = true;
-                canDealUp = false;
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                selectTime_tv.setVisibility(View.INVISIBLE);
-                if (isChanging) Message.obtain(handler, 1, seekBar.getProgress()).sendToTarget();
-                if (isSeekBarShow) handler.sendMessageDelayed(Message.obtain(handler, 8), 3000);
-                videoStart();
-                isChanging = false;
-            }
-        });
     }
 
     private void setAllVisible(boolean visible) {
@@ -434,6 +306,103 @@ public class PlayActivity extends Activity {
         mediaPlayer.pause();
     }
 
+    private void setButtonListener() {
+        View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                switch (view.getId()) {
+                    case R.id.change_screen_btn:
+                        //横竖屏切换
+                        StaticMethod.currentDuration = seekBar.getProgress();
+                        System.out.println("!!!!!1:" + StaticMethod.currentDuration);
+                        t.cancel();
+                        tt.cancel();
+                        if (StaticMethod.mScreen)
+                            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                        else setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                        StaticMethod.mScreen = !StaticMethod.mScreen;
+                        break;
+                    case R.id.video_btn_play:
+                    case R.id.start_pause_btn:
+                        //暂停播放
+                        if (mediaPlayer.isPlaying()) videoPause();
+                        else videoStart();
+                        break;
+                    case R.id.right_btn:
+                        //前进5秒
+                        if (mediaPlayer != null && mediaPlayer.getCurrentPosition() <= videolength - 5000)
+                            mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() + 5000);
+                        break;
+                    case R.id.left_btn:
+                        //后退5秒
+                        if (mediaPlayer != null && mediaPlayer.getCurrentPosition() >= 5000)
+                            mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() - 5000);
+                        break;
+                    case R.id.lock_screen_btn:
+                        //锁屏
+                        isLock = true;
+                        setAllVisible(false);
+                        break;
+                    case R.id.unlock_screen_btn:
+                        //解除锁屏
+                        isLock = false;
+                        unlock_btn.setVisibility(View.INVISIBLE);
+                        setAllVisible(true);
+                        break;
+                }
+                fingerUpTime = System.currentTimeMillis();
+                handler.sendMessageDelayed(Message.obtain(handler, ALL_HIDE), 4000);
+            }
+        };
+        findViewById(R.id.change_screen_btn).setOnClickListener(listener);
+        findViewById(R.id.left_btn).setOnClickListener(listener);
+        findViewById(R.id.right_btn).setOnClickListener(listener);
+        play_btn.setOnClickListener(listener);
+        start_pause_btn.setOnClickListener(listener);
+        lock_btn.setOnClickListener(listener);
+        unlock_btn.setOnClickListener(listener);
+    }
+
+    private void setVolumeBrightnessListener() {
+        volumeBar.setMax(StaticMethod.getMaxVolume(this));
+        volumeBar.setProgress(StaticMethod.getCurrentVolume(this));
+        brightnessBar.setMax(BrightTools.getMaxScreenBrightness());
+        brightnessBar.setProgress(BrightTools.getScreenBrightness(this));
+
+        volumeBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                StaticMethod.setVolume(PlayActivity.this, seekBar.getProgress());
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        brightnessBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                BrightTools.setBrightness(PlayActivity.this, seekBar.getProgress());
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+    }
+
     private void setScreenListener() {
         screenObserver = new ScreenObserver(this);
         ScreenObserver.ScreenStateListener stateListener = new ScreenObserver.ScreenStateListener() {
@@ -461,7 +430,46 @@ public class PlayActivity extends Activity {
         screenObserver.startObserver(stateListener);
     }
 
-    class MyGestureDetector extends GestureDetector.SimpleOnGestureListener {
+    private void setSeekListener() {
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int count = 0;
+
+            @Override
+            public void onProgressChanged(final SeekBar seekBar, int i, boolean b) {
+                int currentTime = seekBar.getProgress();
+                String time = StaticMethod.getMusicTime(seekBar.getProgress());
+                currentTime_tv.setText(time);
+                selectTime_tv.setText(time);
+                if (isChanging && ++count >= 5) {
+                    Message.obtain(handler, SEEKTO, currentTime).sendToTarget();
+                    count = 0;
+                }
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                selectTime_tv.setVisibility(View.VISIBLE);
+                mediaPlayer.pause();
+                isChanging = true;
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                selectTime_tv.setVisibility(View.INVISIBLE);
+                if (isChanging)
+                    Message.obtain(handler, SEEKTO, seekBar.getProgress()).sendToTarget();
+                if (isSeekBarShow) {
+                    fingerUpTime = System.currentTimeMillis();
+                    handler.sendMessageDelayed(Message.obtain(handler, ALL_HIDE), 4000);
+                }
+                videoStart();
+                isChanging = false;
+            }
+        });
+    }
+
+    private class MyGestureDetector extends GestureDetector.SimpleOnGestureListener {
         int lastSeekProgress = -1;//上次播放进度条的位置
         int lastVoiceProgress = -1;//上次音乐进度条的位置
         int lastScreenProgress = -1;//上次亮度进度条的位置
@@ -470,17 +478,15 @@ public class PlayActivity extends Activity {
         public boolean onDown(MotionEvent motionEvent) {
             if (!isSeekBarShow) setAllVisible(true);
             lastSeekProgress = seekBar.getProgress();
-            lastVoiceProgress = voiceBar.getProgress();
-            lastScreenProgress = screenBar.getProgress();
-            isVoiceBarShow = false;
-            isScreenBarShow = false;
-            canDealUp = false;
+            lastVoiceProgress = volumeBar.getProgress();
+            lastScreenProgress = brightnessBar.getProgress();
+            isVolumeBarShow = false;
+            isBrightnessBarShow = false;
             return true;
         }
 
         @Override
         public boolean onDoubleTap(MotionEvent e) {
-            canDealUp = false;
             if (mediaPlayer.isPlaying()) videoPause();
             else videoStart();
             return true;
@@ -488,17 +494,16 @@ public class PlayActivity extends Activity {
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            canDealUp = false;
             if (screenWidth - e1.getX() < screenWidth / 2 && Math.abs(distanceY) > Math.abs(distanceX) * 5) {//音乐调节
-                Message.obtain(handler, 3,
-                        lastVoiceProgress + (int) ((e1.getY() - e2.getY()) / screenHeight * voiceBar.getMax() * 2)
+                Message.obtain(handler, VOLUME_SHOW,
+                        lastVoiceProgress + (int) ((e1.getY() - e2.getY()) / screenHeight * volumeBar.getMax() * 2)
                 ).sendToTarget();
-                isVoiceBarShow = true;
+                isVolumeBarShow = true;
             } else if (e1.getX() < screenWidth / 2 && Math.abs(distanceY) > Math.abs(distanceX) * 5) {//亮度调节
-                Message.obtain(handler, 4,
-                        lastScreenProgress + (int) ((e1.getY() - e2.getY()) / screenHeight * screenBar.getMax() * 2)
+                Message.obtain(handler, BRIGHTNESS_SHOW,
+                        lastScreenProgress + (int) ((e1.getY() - e2.getY()) / screenHeight * brightnessBar.getMax() * 2)
                 ).sendToTarget();
-                isScreenBarShow = true;
+                isBrightnessBarShow = true;
             } else if (Math.abs(distanceY) * 5 < Math.abs(distanceX)) { //进度调节
                 if (mediaPlayer.isPlaying() && Math.abs(e1.getX() - e2.getX()) > 30) {
                     mediaPlayer.pause();
@@ -506,17 +511,17 @@ public class PlayActivity extends Activity {
                     isChanging = true;
                     isHMoving = true;
                 }
-                if (isChanging && !mediaPlayer.isPlaying())
-                    Message.obtain(handler, 2,
-                            lastSeekProgress + (int) ((e2.getX() - e1.getX()) / screenWidth * 60000)
-                    ).sendToTarget();
+                if (isChanging && !mediaPlayer.isPlaying()) {
+                    int k = lastSeekProgress + (int) ((e2.getX() - e1.getX()) / screenWidth * 60000);
+                    Message.obtain(handler, SEEKTO, k).sendToTarget();
+                    seekBar.setProgress(k);
+                }
             }
             return true;
         }
 
         @Override
         public void onLongPress(MotionEvent motionEvent) {
-            canDealUp = false;
             if (mediaPlayer.isPlaying()) videoPause();
             else videoStart();
         }

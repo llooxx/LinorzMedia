@@ -44,18 +44,23 @@ public class VideoFragment extends MediaFragment {
 
     @Override
     protected void load() {
+        for (int i = 0; i < videos.size(); i++) {
+            final int ii = i;
+            Map<String, Object> map = new HashMap<>();
+            map.put("name", videos.get(i).getTitle());
+            map.put("time", StaticMethod.getMusicTime(videos.get(i).getDuration()));
+            map.put("path", "file://" + videos.get(i).getPath());
+            items.add(map);
+            adapter.notifyItemInserted(ii);
+        }
+
         new Thread(new Runnable() {
             @Override
             public void run() {
                 for (int i = 0; i < videos.size(); i++) {
-                    final int ii = i;
-                    Map<String, Object> map = new HashMap<>();
+                    Map<String, Object> map = items.get(i);
                     map.put("img", StaticMethod.createVideoThumbnail(videos.get(i).getPath()));
-                    map.put("name", videos.get(i).getTitle());
-                    map.put("time", StaticMethod.getMusicTime(videos.get(i).getDuration()));
-                    map.put("path", "file://" + videos.get(i).getPath());
-                    items.add(map);
-                    adapter.notifyItemInserted(ii);
+                    adapter.notifyItemChanged(i);
                 }
             }
         }).start();

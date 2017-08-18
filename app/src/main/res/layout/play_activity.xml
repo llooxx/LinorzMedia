@@ -143,7 +143,6 @@
             android:paddingBottom="15dp"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:paddingTop="15dp"
             android:visibility="invisible">
 
             <LinearLayout
@@ -155,23 +154,26 @@
 
                 <Button
                     android:id="@+id/left_btn"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:background="@drawable/doubletri_left" />
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/doubletri_left"
+                    android:padding="12dp" />
 
                 <Button
                     android:id="@+id/start_pause_btn"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
                     android:layout_marginLeft="40dp"
                     android:layout_marginRight="40dp"
-                    android:background="@drawable/btn_pause" />
+                    android:background="@drawable/btn_pause"
+                    android:padding="10dp" />
 
                 <Button
                     android:id="@+id/right_btn"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:background="@drawable/doubletri_right" />
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/doubletri_right"
+                    android:padding="12dp" />
 
             </LinearLayout>
 
