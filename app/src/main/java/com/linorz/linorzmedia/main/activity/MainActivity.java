@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
     private TimerTask tt;
     private RotateAnimation animation;
     private AudioPlay audioPlay;
+    private AudioPlay.AudioListener audioListener;
     private Intent intent;
 
     private ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -111,15 +112,47 @@ public class MainActivity extends AppCompatActivity {
             public void onCompletion(MediaPlayer mediaPlayer) {
                 //随机
                 audioPlay.current_num = (int) (audioPlay.getAudios().size() * Math.random());
-                setAudio(audioPlay.current_num, true);
+                audioPlay.setAudio(audioPlay.current_num, true);
             }
         });
+        audioListener = new AudioPlay.AudioListener() {
+            @Override
+            public void start() {
+                play_btn.setImageResource(R.drawable.btn_pause_white);
+                audio_state.setText("正在播放");
+            }
+
+            @Override
+            public void pause() {
+                play_btn.setImageResource(R.drawable.btn_play_white);
+                audio_state.setText("已暂停");
+            }
+
+            @Override
+            public void changeAudio(boolean play) {
+                Audio audio = audioPlay.getCurrentAudio();
+                //跳转
+                audioFragment.jumpToPositon(audioPlay.current_num);
+                audioFragment.changeAudio(audioPlay.current_num);
+                audio_title.setText(audio.getTitle());
+                audio_author.setText(audio.getArtist());
+                if (play) {
+                    audio_state.setText("正在播放");
+                    play_btn.setImageResource(R.drawable.btn_pause_white);
+                } else {
+                    audio_state.setText("已暂停");
+                    play_btn.setImageResource(R.drawable.btn_play_white);
+                }
+                setVideoTimeTask();
+            }
+        };
+        audioPlay.addAudioListener(audioListener);
         //在onCreatView外进行
         new Handler().postDelayed(new Runnable() {
             public void run() {
                 initFab();//开线程时，已经绘制完成，能获得view的宽高
                 audioPlay.current_num = audioPlay.getLastAudioNum();
-                setAudio(audioPlay.current_num, false);
+                audioPlay.setAudio(audioPlay.current_num, false);
 
                 //开启通知栏控制器
                 intent = new Intent(MainActivity.this, AudioService.class);
@@ -158,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
         videoFragment.setPlayAudioListener(new PlayAudio() {
             @Override
             public void playAudio(int i) {
-                if (audioPlay.isPlaying()) startOrPause(false);
+                if (audioPlay.isPlaying()) audioPlay.pause();
             }
 
             @Override
@@ -170,12 +203,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void playAudio(int i) {
                 if (i == audioPlay.current_num) return;
-                setAudio(i, true);
+                audioPlay.setAudio(i, true);
             }
 
             @Override
             public void playAudioTwo(int i) {
-                if (audioPlay.isPlaying()) startOrPause(false);
+                if (audioPlay.isPlaying()) audioPlay.pause();
                 Audio audio = audioPlay.getAudio(i);
                 StaticMethod.currentDuration = -1;
                 Intent intent = new Intent(MainActivity.this, PlayActivity.class);
@@ -264,17 +297,17 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (view == btns[5]) {
                     //播放暂停
-                    if (audioPlay.isPlaying()) startOrPause(false);
-                    else startOrPause(true);
+                    if (audioPlay.isPlaying()) audioPlay.pause();
+                    else audioPlay.start();
                 } else if (view == btns[0]) {
                     //下一个
-                    if (!setAudio(++audioPlay.current_num, true)) {
+                    if (!audioPlay.setAudio(++audioPlay.current_num, true)) {
                         audioPlay.current_num--;
                         Toast.makeText(MainActivity.this, "后面没有歌啦", Toast.LENGTH_SHORT).show();
                     }
                 } else if (view == btns[4]) {
                     //前一个
-                    if (!setAudio(--audioPlay.current_num, true)) {
+                    if (!audioPlay.setAudio(--audioPlay.current_num, true)) {
                         audioPlay.current_num++;
                         Toast.makeText(MainActivity.this, "后面没有歌啦", Toast.LENGTH_SHORT).show();
                     }
@@ -295,27 +328,6 @@ public class MainActivity extends AppCompatActivity {
         for (ImageView btn : btns) btn.setOnClickListener(onClickListener);
     }
 
-    private boolean setAudio(int num, boolean play) {
-        boolean result = audioPlay.setAudio(num, play);
-        if (result) {
-            Audio audio = audioPlay.getCurrentAudio();
-            //跳转
-            audioFragment.jumpToPositon(num);
-            audioFragment.changeAudio(num);
-            audio_title.setText(audio.getTitle());
-            audio_author.setText(audio.getArtist());
-            if (play) {
-                audio_state.setText("正在播放");
-                play_btn.setImageResource(R.drawable.btn_pause_white);
-            } else {
-                audio_state.setText("已暂停");
-                play_btn.setImageResource(R.drawable.btn_play_white);
-            }
-            setVideoTimeTask();
-        }
-        return result;
-    }
-
     private void setVideoTimeTask() {
         if (t != null) t.cancel();
         if (tt != null) tt.cancel();
@@ -333,18 +345,6 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         t.schedule(tt, 0, 10);
-    }
-
-    private void startOrPause(boolean sp) {
-        if (sp) {
-            play_btn.setImageResource(R.drawable.btn_pause_white);
-            audio_state.setText("正在播放");
-            audioPlay.start();
-        } else {
-            play_btn.setImageResource(R.drawable.btn_play_white);
-            audio_state.setText("已暂停");
-            audioPlay.pause();
-        }
     }
 
     @Override
@@ -371,7 +371,10 @@ public class MainActivity extends AppCompatActivity {
                 //启动悬浮窗
                 intent = new Intent(this, LinorzService.class);
                 startService(intent);
-                finish();
+                //返回桌面
+                Intent home = new Intent(Intent.ACTION_MAIN);
+                home.addCategory(Intent.CATEGORY_HOME);
+                startActivity(home);
                 break;
             default:
                 break;
@@ -419,6 +422,8 @@ public class MainActivity extends AppCompatActivity {
                 if (t != null) t.cancel();
                 if (tt != null) tt.cancel();
                 audioPlay.stop();
+                intent = new Intent(MainActivity.this, AudioService.class);
+                stopService(intent);
                 finish();
             }
         }).show();

@@ -34,6 +34,7 @@ public class LinorzService extends Service {
     private static ServiceFloatView rfv;
     private ImageView play_btn;
     private AudioPlay audioPlay;
+    private AudioPlay.AudioListener audioListener;
     public static LinorzService instance;
     private Handler handler = new Handler(new Handler.Callback() {
         @Override
@@ -58,11 +59,28 @@ public class LinorzService extends Service {
     public void onCreate() {
         super.onCreate();
         instance = this;
-        audioPlay = AudioPlay.instance;
         wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         wml = getDefaultSystemWindowParams(this, StaticMethod.dipTopx(this, 60));
         am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         initButton();
+        audioPlay = AudioPlay.instance;
+        audioListener = new AudioPlay.AudioListener() {
+            @Override
+            public void start() {
+                play_btn.setImageResource(R.drawable.btn_pause_white);
+            }
+
+            @Override
+            public void pause() {
+                play_btn.setImageResource(R.drawable.btn_play_white);
+            }
+
+            @Override
+            public void changeAudio(boolean play) {
+
+            }
+        };
+        audioPlay.addAudioListener(audioListener);
     }
 
     @Override
@@ -140,17 +158,17 @@ public class LinorzService extends Service {
             public void onClick(View view) {
                 if (view == btns[5]) {
                     //播放暂停
-                    if (audioPlay.isPlaying()) startOrPause(false);
-                    else startOrPause(true);
+                    if (audioPlay.isPlaying()) audioPlay.pause();
+                    else audioPlay.start();
                 } else if (view == btns[0]) {
                     //下一个
-                    if (!setAudio(++audioPlay.current_num, true)) {
+                    if (!audioPlay.setAudio(++audioPlay.current_num, true)) {
                         audioPlay.current_num--;
                         Toast.makeText(LinorzService.this, "后面没有歌啦", Toast.LENGTH_SHORT).show();
                     }
                 } else if (view == btns[4]) {
                     //前一个
-                    if (!setAudio(--audioPlay.current_num, true)) {
+                    if (!audioPlay.setAudio(--audioPlay.current_num, true)) {
                         audioPlay.current_num++;
                         Toast.makeText(LinorzService.this, "后面没有歌啦", Toast.LENGTH_SHORT).show();
                     }
@@ -170,28 +188,6 @@ public class LinorzService extends Service {
         for (ImageView btn : btns) btn.setOnClickListener(onClickListener);
     }
 
-    private boolean setAudio(int num, boolean play) {
-        boolean result = audioPlay.setAudio(num, play);
-        if (result) {
-            if (play) {
-                play_btn.setImageResource(R.drawable.btn_pause_white);
-            } else {
-                play_btn.setImageResource(R.drawable.btn_play_white);
-            }
-        }
-        return result;
-    }
-
-    private void startOrPause(boolean sp) {
-        if (sp) {
-            play_btn.setImageResource(R.drawable.btn_pause_white);
-            audioPlay.start();
-        } else {
-            play_btn.setImageResource(R.drawable.btn_play_white);
-            audioPlay.pause();
-        }
-    }
-
     public WindowManager.LayoutParams getDefaultSystemWindowParams(Context context, int size) {
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 size,
@@ -208,6 +204,7 @@ public class LinorzService extends Service {
     @Override
     public void onDestroy() {
         handler.sendMessage(Message.obtain(handler, 2));
+        audioPlay.removeAudioListener(audioListener);
         super.onDestroy();
     }
 }

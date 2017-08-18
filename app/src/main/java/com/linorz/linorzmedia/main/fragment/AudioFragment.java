@@ -42,7 +42,8 @@ public class AudioFragment extends MediaFragment {
     });
 
     public AudioFragment() {
-        this.audioPlay = new AudioPlay();
+        if (AudioPlay.instance == null)
+            this.audioPlay = new AudioPlay();
     }
 
     public AudioPlay getAudioPlay() {

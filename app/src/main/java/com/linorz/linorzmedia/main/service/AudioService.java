@@ -9,13 +9,13 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.support.v7.app.NotificationCompat;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import linorz.com.linorzmedia.R;
+import linorz.com.linorzmedia.main.activity.MainActivity;
 import linorz.com.linorzmedia.media.AudioPlay;
 
 /**
@@ -25,13 +25,16 @@ import linorz.com.linorzmedia.media.AudioPlay;
 public class AudioService extends Service {
     public static final String ACTION_NOTIFICATION = "action_notification";
     public static final String BUTTON_INDEX = "button_index";
-    public static final String BUTTON_PREV = "0";
-    public static final String BUTTON_PLAY = "1";
-    public static final String BUTTON_NEXT = "2";
+    public static final String BUTTON_ICON = "0";
+    public static final String BUTTON_PREV = "1";
+    public static final String BUTTON_PLAY = "2";
+    public static final String BUTTON_NEXT = "3";
     private NotificationManager notifyManager;
     private Notification notification;
     private RemoteViews remoteViews;
     private AudioPlay audioPlay;
+    private AudioPlay.AudioListener audioListener;
+
     private Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message message) {
@@ -42,9 +45,9 @@ public class AudioService extends Service {
                     break;
                 case 2:
                     if (audioPlay.isPlaying()) {
-                        remoteViews.setImageViewResource(R.id.notification_play, R.drawable.btn_play_white);
-                    } else {
                         remoteViews.setImageViewResource(R.id.notification_play, R.drawable.btn_pause_white);
+                    } else {
+                        remoteViews.setImageViewResource(R.id.notification_play, R.drawable.btn_play_white);
                     }
                     notifyManager.notify(233, notification);
                     break;
@@ -65,23 +68,32 @@ public class AudioService extends Service {
     public void onCreate() {
         super.onCreate();
         remoteViews = new RemoteViews(getPackageName(), R.layout.notification);
-        Intent intent = new Intent(this, AudioService.class);
-        intent.setAction(AudioService.ACTION_NOTIFICATION);
-        PendingIntent pendingIntent;
+        //返回activity
+        Intent appIntent = new Intent(this, MainActivity.class);
+        appIntent.setAction(Intent.ACTION_MAIN);
+        appIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        appIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);//关键的一步，设置启动模式
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, appIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        remoteViews.setOnClickPendingIntent(R.id.notification_icon, contentIntent);
 
-        intent.putExtra(AudioService.BUTTON_INDEX, AudioService.BUTTON_PREV);
+        //初始化
+        Intent intent = new Intent(this, AudioService.class);
+        intent.setAction(ACTION_NOTIFICATION);
+        PendingIntent pendingIntent;
+        //上一个
+        intent.putExtra(BUTTON_INDEX, BUTTON_PREV);
         pendingIntent = PendingIntent.getService(this, 1, intent, PendingIntent.FLAG_CANCEL_CURRENT);
         remoteViews.setOnClickPendingIntent(R.id.notification_pre, pendingIntent);
-
-        intent.putExtra(AudioService.BUTTON_INDEX, AudioService.BUTTON_PLAY);
+        //暂停播放
+        intent.putExtra(BUTTON_INDEX, BUTTON_PLAY);
         pendingIntent = PendingIntent.getService(this, 2, intent, PendingIntent.FLAG_CANCEL_CURRENT);
         remoteViews.setOnClickPendingIntent(R.id.notification_play, pendingIntent);
-
-        intent.putExtra(AudioService.BUTTON_INDEX, AudioService.BUTTON_NEXT);
+        //下一个
+        intent.putExtra(BUTTON_INDEX, BUTTON_NEXT);
         pendingIntent = PendingIntent.getService(this, 3, intent, PendingIntent.FLAG_CANCEL_CURRENT);
         remoteViews.setOnClickPendingIntent(R.id.notification_next, pendingIntent);
 
-
+        //通知栏初始化
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
         mBuilder.setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示，一般是系统获取到的时间
                 .setPriority(Notification.PRIORITY_MAX) //设置该通知优先级
@@ -92,9 +104,9 @@ public class AudioService extends Service {
         notifyManager = (NotificationManager)
                 getSystemService(Context.NOTIFICATION_SERVICE);
         notifyManager.notify(233, notification);
-
+        //获取播放器控制
         audioPlay = AudioPlay.instance;
-        audioPlay.setAudioServiceAcion(new AudioPlay.AudioServiceAciton() {
+        audioListener = new AudioPlay.AudioListener() {
             @Override
             public void start() {
                 handler.sendMessage(Message.obtain(handler, 2));
@@ -106,10 +118,11 @@ public class AudioService extends Service {
             }
 
             @Override
-            public void changeAudio() {
+            public void changeAudio(boolean play) {
                 handler.sendMessage(Message.obtain(handler, 1));
             }
-        });
+        };
+        audioPlay.addAudioListener(audioListener);
         handler.sendMessage(Message.obtain(handler, 1));
     }
 
@@ -121,11 +134,8 @@ public class AudioService extends Service {
         if (action.equals(ACTION_NOTIFICATION)) {
             switch (stringExtra) {
                 case BUTTON_PLAY:
-                    if (audioPlay.isPlaying()) {
-                        audioPlay.pause();
-                    } else {
-                        audioPlay.start();
-                    }
+                    if (audioPlay.isPlaying()) audioPlay.pause();
+                    else audioPlay.start();
                     break;
                 case BUTTON_NEXT:
                     //下一个
@@ -145,5 +155,12 @@ public class AudioService extends Service {
         }
 
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
+    public void onDestroy() {
+        audioPlay.removeAudioListener(audioListener);
+        notifyManager.cancel(233);
+        super.onDestroy();
     }
 }

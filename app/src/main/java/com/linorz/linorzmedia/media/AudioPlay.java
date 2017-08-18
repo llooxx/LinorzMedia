@@ -25,7 +25,7 @@ public class AudioPlay {
     private Context context;
     private MediaPlayer.OnCompletionListener onCompletionListener;
     //接口
-    private AudioServiceAciton asa;
+    private ArrayList<AudioListener> audioListenerList;
     public int current_num = 0;
     public static AudioPlay instance;
 
@@ -36,6 +36,7 @@ public class AudioPlay {
         mySharedPreferences = context.getSharedPreferences("LinorzMedia", Context.MODE_PRIVATE);
         editor = mySharedPreferences.edit();
         instance = this;
+        audioListenerList = new ArrayList<>();
     }
 
     //get
@@ -77,12 +78,12 @@ public class AudioPlay {
 
     public void start() {
         if (main_player != null) main_player.start();
-        if (asa != null) asa.start();
+        for (AudioListener audioListener : audioListenerList) audioListener.start();
     }
 
     public void pause() {
         if (main_player != null) main_player.pause();
-        if (asa != null) asa.pause();
+        for (AudioListener audioListener : audioListenerList) audioListener.pause();
     }
 
     public void stop() {
@@ -115,7 +116,7 @@ public class AudioPlay {
         }
         if (onCompletionListener != null)
             main_player.setOnCompletionListener(onCompletionListener);
-        if (asa != null) asa.changeAudio();
+        for (AudioListener audioListener : audioListenerList) audioListener.changeAudio(play);
     }
 
     public boolean setAudio(int num, boolean play) {
@@ -131,15 +132,19 @@ public class AudioPlay {
     }
 
 
-    public void setAudioServiceAcion(AudioServiceAciton asa) {
-        this.asa = asa;
+    public void addAudioListener(AudioListener audioListener) {
+        audioListenerList.add(audioListener);
     }
 
-    public interface AudioServiceAciton {
+    public boolean removeAudioListener(AudioListener audioListener) {
+        return audioListenerList.remove(audioListener);
+    }
+
+    public interface AudioListener {
         void start();
 
         void pause();
 
-        void changeAudio();
+        void changeAudio(boolean play);
     }
 }
