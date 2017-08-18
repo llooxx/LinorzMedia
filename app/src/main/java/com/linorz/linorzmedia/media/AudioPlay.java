@@ -17,6 +17,7 @@ import com.linorz.linorzmedia.mediatools.Audio;
  */
 
 public class AudioPlay {
+    public static AudioPlay instance;//单例
     private MediaPlayer main_player;
     private Audio current_audio;
     private ArrayList<Audio> audios;
@@ -24,10 +25,10 @@ public class AudioPlay {
     private SharedPreferences.Editor editor;
     private Context context;
     private MediaPlayer.OnCompletionListener onCompletionListener;
+    private float current_volume = 1.0f;
+    public int current_num = 0;
     //接口
     private ArrayList<AudioListener> audioListenerList;
-    public int current_num = 0;
-    public static AudioPlay instance;
 
     @SuppressLint("CommitPrefEdits")
     public AudioPlay() {
@@ -108,6 +109,7 @@ public class AudioPlay {
             main_player.setAudioStreamType(AudioManager.STREAM_MUSIC);
             main_player.setDataSource("file://" + current_audio.getPath());
             main_player.prepare();
+            main_player.setVolume(current_volume, current_volume);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -125,6 +127,18 @@ public class AudioPlay {
         current_num = num;
         setAudio(audio, play);
         return true;
+    }
+
+    public void volumeUp() {
+        current_volume += 0.1f;
+        if (current_volume > 1.0f) current_volume = 1.0f;
+        main_player.setVolume(current_volume, current_volume);
+    }
+
+    public void volumeDown() {
+        current_volume -= 0.1f;
+        if (current_volume < 0.1f) current_volume = 0.1f;
+        main_player.setVolume(current_volume, current_volume);
     }
 
     public void setAudioPlayAction(MediaPlayer.OnCompletionListener ocl) {

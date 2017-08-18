@@ -325,12 +325,10 @@ public class MainActivity extends AppCompatActivity {
                     list.get(viewPager.getCurrentItem()).jumpTop();
                 } else if (view == btns[1]) {
                     //增大音量
-                    int currentVolume = StaticMethod.getCurrentVolume(MainActivity.this);
-                    StaticMethod.setVolume(MainActivity.this, ++currentVolume);
+                    audioPlay.volumeUp();
                 } else if (view == btns[3]) {
                     //减小音量
-                    int currentVolume = StaticMethod.getCurrentVolume(MainActivity.this);
-                    StaticMethod.setVolume(MainActivity.this, --currentVolume);
+                    audioPlay.volumeDown();
                 }
             }
         };

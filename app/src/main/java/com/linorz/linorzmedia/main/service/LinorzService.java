@@ -176,12 +176,10 @@ public class LinorzService extends Service {
                     //回到顶端
                 } else if (view == btns[1]) {
                     //增大音量
-                    int currentVolume = StaticMethod.getCurrentVolume(LinorzService.this);
-                    StaticMethod.setVolume(LinorzService.this, ++currentVolume);
+                    audioPlay.volumeUp();
                 } else if (view == btns[3]) {
                     //减小音量
-                    int currentVolume = StaticMethod.getCurrentVolume(LinorzService.this);
-                    StaticMethod.setVolume(LinorzService.this, --currentVolume);
+                    audioPlay.volumeDown();
                 }
             }
         };
