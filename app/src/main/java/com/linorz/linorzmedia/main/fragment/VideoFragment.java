@@ -1,5 +1,6 @@
 package com.linorz.linorzmedia.main.fragment;
 
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
@@ -22,7 +23,7 @@ public class VideoFragment extends MediaFragment {
 
     @Override
     protected RecyclerView.Adapter getAdapter() {
-        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        recyclerView.setLayoutManager(new GridLayoutManager(context,2));
         videos = (ArrayList<Video>) new VideoProvider(context).getList();
         VideoAdapter videoAdapter = new VideoAdapter(context, items);
         videoAdapter.setPlayAudioListener(new PlayAudio() {
@@ -60,7 +61,10 @@ public class VideoFragment extends MediaFragment {
                 for (int i = 0; i < videos.size(); i++) {
                     Map<String, Object> map = items.get(i);
                     map.put("img", StaticMethod.createVideoThumbnail(videos.get(i).getPath()));
-                    adapter.notifyItemChanged(i);
+                    if (recyclerView.getScrollState() != RecyclerView.SCROLL_STATE_IDLE
+                            || (!recyclerView.isComputingLayout())) {
+                        adapter.notifyItemChanged(i);
+                    }
                 }
             }
         }).start();

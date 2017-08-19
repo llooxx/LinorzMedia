@@ -42,6 +42,8 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoItem> {
         Object object = mapList.get(i).get("img");
         if (object != null)
             videoItem.img.setImageBitmap((Bitmap) object);
+        else
+            videoItem.img.setImageResource(R.drawable.lock);
         videoItem.name.setText((String) mapList.get(i).get("name"));
         videoItem.time.setText((String) mapList.get(i).get("time"));
         videoItem.path = (String) mapList.get(i).get("path");
