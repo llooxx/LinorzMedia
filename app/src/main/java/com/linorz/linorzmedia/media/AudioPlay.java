@@ -67,6 +67,10 @@ public class AudioPlay {
         return audios;
     }
 
+    public float getVolume() {
+        return current_volume;
+    }
+
     //action
     public boolean isPlaying() {
         return main_player != null && main_player.isPlaying();
@@ -115,10 +119,15 @@ public class AudioPlay {
         }
         if (play) {
             main_player.start();
-        }
+            for (AudioListener audioListener : audioListenerList) audioListener.start();
+        } else
+            for (AudioListener audioListener : audioListenerList) audioListener.pause();
         if (onCompletionListener != null)
             main_player.setOnCompletionListener(onCompletionListener);
-        for (AudioListener audioListener : audioListenerList) audioListener.changeAudio(play);
+        for (AudioListener audioListener : audioListenerList) {
+            audioListener.changeAudio(play);
+            audioListener.changeVolume(current_volume);
+        }
     }
 
     public boolean setAudio(int num, boolean play) {
@@ -133,12 +142,16 @@ public class AudioPlay {
         current_volume += 0.1f;
         if (current_volume > 1.0f) current_volume = 1.0f;
         main_player.setVolume(current_volume, current_volume);
+        for (AudioListener audioListener : audioListenerList)
+            audioListener.changeVolume(current_volume);
     }
 
     public void volumeDown() {
         current_volume -= 0.1f;
         if (current_volume < 0.1f) current_volume = 0.1f;
         main_player.setVolume(current_volume, current_volume);
+        for (AudioListener audioListener : audioListenerList)
+            audioListener.changeVolume(current_volume);
     }
 
     public void setAudioPlayAction(MediaPlayer.OnCompletionListener ocl) {
@@ -160,5 +173,7 @@ public class AudioPlay {
         void pause();
 
         void changeAudio(boolean play);
+
+        void changeVolume(float volume);
     }
 }

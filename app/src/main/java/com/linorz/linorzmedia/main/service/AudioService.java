@@ -25,12 +25,12 @@ import com.linorz.linorzmedia.mediatools.Audio;
  */
 
 public class AudioService extends Service {
-    public static final String ACTION_NOTIFICATION = "action_notification";
-    public static final String BUTTON_INDEX = "button_index";
-    public static final String BUTTON_ICON = "0";
-    public static final String BUTTON_PREV = "1";
-    public static final String BUTTON_PLAY = "2";
-    public static final String BUTTON_NEXT = "3";
+    private final String ACTION_NOTIFICATION = "action_notification";
+    private final String BUTTON_INDEX = "button_index";
+    private final String BUTTON_ICON = "0", BUTTON_PREV = "1",
+            BUTTON_PLAY = "2", BUTTON_NEXT = "3",
+            BUTTON_UP = "4", BUTTON_DOWN = "5";
+    private final int HANDLER_CHANGE_AUDIO = 1, HANDLER_CHANGE_PLAY = 2, HANDLER_CHANGE_VOLUME = 3;
     private NotificationManager notifyManager;
     private Notification notification;
     private RemoteViews remoteViews;
@@ -42,7 +42,7 @@ public class AudioService extends Service {
         @Override
         public boolean handleMessage(Message message) {
             switch (message.what) {
-                case 1:
+                case HANDLER_CHANGE_AUDIO:
                     Audio audio = audioPlay.getCurrentAudio();
                     bitmap = audio.getArtwork(AudioService.this);
                     if (bitmap != null)
@@ -52,15 +52,16 @@ public class AudioService extends Service {
                     remoteViews.setTextViewText(R.id.notification_name, audio.getTitle());
                     notifyManager.notify(233, notification);
                     break;
-                case 2:
-                    if (audioPlay.isPlaying()) {
+                case HANDLER_CHANGE_PLAY:
+                    if (audioPlay.isPlaying())
                         remoteViews.setImageViewResource(R.id.notification_play, R.drawable.btn_pause_white);
-                    } else {
+                    else
                         remoteViews.setImageViewResource(R.id.notification_play, R.drawable.btn_play_white);
-                    }
                     notifyManager.notify(233, notification);
                     break;
-                case 3:
+                case HANDLER_CHANGE_VOLUME:
+                    remoteViews.setTextViewText(R.id.notification_volume, (int) (audioPlay.getVolume() * 10) + "");
+                    notifyManager.notify(233, notification);
                     break;
             }
             return false;
@@ -101,6 +102,15 @@ public class AudioService extends Service {
         intent.putExtra(BUTTON_INDEX, BUTTON_NEXT);
         pendingIntent = PendingIntent.getService(this, 3, intent, PendingIntent.FLAG_CANCEL_CURRENT);
         remoteViews.setOnClickPendingIntent(R.id.notification_next, pendingIntent);
+        //音量大
+        intent.putExtra(BUTTON_INDEX, BUTTON_UP);
+        pendingIntent = PendingIntent.getService(this, 4, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        remoteViews.setOnClickPendingIntent(R.id.notification_up, pendingIntent);
+        //音量减
+        intent.putExtra(BUTTON_INDEX, BUTTON_DOWN);
+        pendingIntent = PendingIntent.getService(this, 5, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        remoteViews.setOnClickPendingIntent(R.id.notification_down, pendingIntent);
+
 
         //通知栏初始化
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
@@ -118,21 +128,28 @@ public class AudioService extends Service {
         audioListener = new AudioPlay.AudioListener() {
             @Override
             public void start() {
-                handler.sendMessage(Message.obtain(handler, 2));
+                Message.obtain(handler, HANDLER_CHANGE_PLAY).sendToTarget();
             }
 
             @Override
             public void pause() {
-                handler.sendMessage(Message.obtain(handler, 2));
+                Message.obtain(handler, HANDLER_CHANGE_PLAY).sendToTarget();
             }
 
             @Override
             public void changeAudio(boolean play) {
-                handler.sendMessage(Message.obtain(handler, 1));
+                Message.obtain(handler, HANDLER_CHANGE_AUDIO).sendToTarget();
+            }
+
+            @Override
+            public void changeVolume(float volume) {
+                Message.obtain(handler, HANDLER_CHANGE_VOLUME).sendToTarget();
             }
         };
         audioPlay.addAudioListener(audioListener);
-        handler.sendMessage(Message.obtain(handler, 1));
+        Message.obtain(handler, HANDLER_CHANGE_AUDIO).sendToTarget();
+        Message.obtain(handler, HANDLER_CHANGE_PLAY).sendToTarget();
+        Message.obtain(handler, HANDLER_CHANGE_VOLUME).sendToTarget();
     }
 
     @Override
@@ -159,6 +176,14 @@ public class AudioService extends Service {
                         audioPlay.current_num++;
                         Toast.makeText(this, "后面没有歌啦", Toast.LENGTH_SHORT).show();
                     }
+                    break;
+                case BUTTON_UP:
+                    //音量大
+                    audioPlay.volumeUp();
+                    break;
+                case BUTTON_DOWN:
+                    //音量小
+                    audioPlay.volumeDown();
                     break;
             }
         }

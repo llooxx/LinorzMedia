@@ -13,7 +13,7 @@ import android.widget.TextView;
 public class HorizontalScrollTextView extends TextView {
     /**
      * android:ellipsize="marquee"
-     * android:lines="1"
+     * android:singleLine="true"
      * android:marqueeRepeatLimit="marquee_forever"
      */
     public HorizontalScrollTextView(Context context) {

@@ -154,6 +154,11 @@ public class MainActivity extends AppCompatActivity {
                     imageView.setImageResource(R.drawable.current);
                 setVideoTimeTask();
             }
+
+            @Override
+            public void changeVolume(float volume) {
+
+            }
         };
         audioPlay.addAudioListener(audioListener);
         //在onCreatView外进行

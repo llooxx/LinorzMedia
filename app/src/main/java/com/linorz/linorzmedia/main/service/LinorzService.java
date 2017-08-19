@@ -79,6 +79,11 @@ public class LinorzService extends Service {
             public void changeAudio(boolean play) {
 
             }
+
+            @Override
+            public void changeVolume(float volume) {
+
+            }
         };
         audioPlay.addAudioListener(audioListener);
     }
