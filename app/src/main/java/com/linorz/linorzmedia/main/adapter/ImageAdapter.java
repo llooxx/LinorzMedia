@@ -18,7 +18,7 @@ import java.util.Map;
 
 import com.linorz.linorzmedia.R;
 import com.linorz.linorzmedia.main.application.LinorzApplication;
-import com.linorz.linorzmedia.media.ZoomImage;
+import com.linorz.linorzmedia.main.activity.ZoomImage;
 import com.linorz.linorzmedia.tools.StaticMethod;
 
 /**

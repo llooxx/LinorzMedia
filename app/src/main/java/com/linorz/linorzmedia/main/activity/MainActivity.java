@@ -1,29 +1,19 @@
 package com.linorz.linorzmedia.main.activity;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -35,7 +25,6 @@ import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.RemoteViews;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,7 +41,7 @@ import com.linorz.linorzmedia.customview.FloatingAction.animation.DefaultAnimati
 import com.linorz.linorzmedia.customview.MyPageTransformer;
 import com.linorz.linorzmedia.customview.RandomFloatView;
 import com.linorz.linorzmedia.main.service.AudioService;
-import com.linorz.linorzmedia.media.AudioPlay;
+import com.linorz.linorzmedia.mediatools.AudioPlay;
 import com.linorz.linorzmedia.main.service.LinorzService;
 import com.linorz.linorzmedia.main.adapter.PagerAdapter;
 import com.linorz.linorzmedia.main.adapter.PlayAudio;
@@ -60,7 +49,6 @@ import com.linorz.linorzmedia.main.fragment.AudioFragment;
 import com.linorz.linorzmedia.main.fragment.ImageFragment;
 import com.linorz.linorzmedia.main.fragment.MediaFragment;
 import com.linorz.linorzmedia.main.fragment.VideoFragment;
-import com.linorz.linorzmedia.media.PlayActivity;
 import com.linorz.linorzmedia.mediatools.Audio;
 import com.linorz.linorzmedia.tools.StaticMethod;
 
@@ -94,22 +82,20 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            String[] permissions = StaticMethod.checkSelfPermissionArray(this, new String[]{
-                    Manifest.permission.SYSTEM_ALERT_WINDOW,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-            });
-            if (permissions.length > 0) {
-                ActivityCompat.requestPermissions(this, permissions, 1);
-            }
-        }
+        StaticMethod.requestPermissions(this);
         setContentView(R.layout.activity_main);
-        final ImageView imageView = (ImageView) findViewById(R.id.main_audio_img);
         initView();
         viewPager.setCurrentItem(1);
+
+        final ImageView audioImage = (ImageView) findViewById(R.id.main_audio_img);
+        audioImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, MediaVisualizerActivity.class));
+            }
+        });
         //音频播放工具获得
-        audioPlay = audioFragment.getAudioPlay();
+        audioPlay = AudioPlay.instance;
         audioPlay.setAudioPlayAction(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
@@ -149,9 +135,9 @@ public class MainActivity extends AppCompatActivity {
                 if (bitmap != null) bitmap.recycle();
                 bitmap = audio.getArtwork(MainActivity.this);
                 if (bitmap != null)
-                    imageView.setImageBitmap(bitmap);
+                    audioImage.setImageBitmap(bitmap);
                 else
-                    imageView.setImageResource(R.drawable.current);
+                    audioImage.setImageResource(R.drawable.current);
                 setVideoTimeTask();
             }
 
@@ -424,6 +410,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        audioPlay.removeAudioListener(audioListener);
+    }
 
     @SuppressLint("ShowToast")
     @Override

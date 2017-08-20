@@ -1,6 +1,5 @@
-package com.linorz.linorzmedia.media;
+package com.linorz.linorzmedia.main.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,7 +13,7 @@ import com.linorz.linorzmedia.tools.StaticMethod;
 /**
  * Created by linorz on 2016/4/3.
  */
-public class ZoomImage extends Activity {
+public class ZoomImage extends SwipeBackActivity {
     CustomSurfaceView sv;
 
     @Override

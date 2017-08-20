@@ -1,4 +1,4 @@
-package com.linorz.linorzmedia.media;
+package com.linorz.linorzmedia.mediatools;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import com.linorz.linorzmedia.main.application.LinorzApplication;
-import com.linorz.linorzmedia.mediatools.Audio;
 
 /**
  * Created by linorz on 2017/8/14.
@@ -18,7 +17,7 @@ import com.linorz.linorzmedia.mediatools.Audio;
 
 public class AudioPlay {
     public static AudioPlay instance;//单例
-    private MediaPlayer main_player;
+    private MediaPlayer mPlayer;
     private Audio current_audio;
     private ArrayList<Audio> audios;
     private SharedPreferences mySharedPreferences;
@@ -56,11 +55,11 @@ public class AudioPlay {
     }
 
     public int getDuration() {
-        return main_player.getDuration();
+        return mPlayer.getDuration();
     }
 
     public int getCurrentPosition() {
-        return main_player.getCurrentPosition();
+        return mPlayer.getCurrentPosition();
     }
 
     public ArrayList<Audio> getAudios() {
@@ -71,9 +70,13 @@ public class AudioPlay {
         return current_volume;
     }
 
+    public MediaPlayer getMediaPlayer() {
+        return mPlayer;
+    }
+
     //action
     public boolean isPlaying() {
-        return main_player != null && main_player.isPlaying();
+        return mPlayer != null && mPlayer.isPlaying();
     }
 
     public void init() {
@@ -82,17 +85,17 @@ public class AudioPlay {
     }
 
     public void start() {
-        if (main_player != null) main_player.start();
+        if (mPlayer != null) mPlayer.start();
         for (AudioListener audioListener : audioListenerList) audioListener.start();
     }
 
     public void pause() {
-        if (main_player != null) main_player.pause();
+        if (mPlayer != null) mPlayer.pause();
         for (AudioListener audioListener : audioListenerList) audioListener.pause();
     }
 
     public void stop() {
-        if (main_player != null) main_player.stop();
+        if (mPlayer != null) mPlayer.stop();
     }
 
     //set
@@ -108,22 +111,22 @@ public class AudioPlay {
         editor.putInt("lastAudioNum", current_num);
         editor.commit();
         try {
-            if (main_player != null) main_player.release();
-            main_player = new MediaPlayer();
-            main_player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            main_player.setDataSource("file://" + current_audio.getPath());
-            main_player.prepare();
-            main_player.setVolume(current_volume, current_volume);
+            if (mPlayer != null) mPlayer.release();
+            mPlayer = new MediaPlayer();
+            mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            mPlayer.setDataSource("file://" + current_audio.getPath());
+            mPlayer.prepare();
+            mPlayer.setVolume(current_volume, current_volume);
         } catch (IOException e) {
             e.printStackTrace();
         }
         if (play) {
-            main_player.start();
+            mPlayer.start();
             for (AudioListener audioListener : audioListenerList) audioListener.start();
         } else
             for (AudioListener audioListener : audioListenerList) audioListener.pause();
         if (onCompletionListener != null)
-            main_player.setOnCompletionListener(onCompletionListener);
+            mPlayer.setOnCompletionListener(onCompletionListener);
         for (AudioListener audioListener : audioListenerList) {
             audioListener.changeAudio(play);
             audioListener.changeVolume(current_volume);
@@ -141,7 +144,7 @@ public class AudioPlay {
     public void volumeUp() {
         current_volume += 0.1f;
         if (current_volume > 1.0f) current_volume = 1.0f;
-        main_player.setVolume(current_volume, current_volume);
+        mPlayer.setVolume(current_volume, current_volume);
         for (AudioListener audioListener : audioListenerList)
             audioListener.changeVolume(current_volume);
     }
@@ -149,7 +152,7 @@ public class AudioPlay {
     public void volumeDown() {
         current_volume -= 0.1f;
         if (current_volume < 0.1f) current_volume = 0.1f;
-        main_player.setVolume(current_volume, current_volume);
+        mPlayer.setVolume(current_volume, current_volume);
         for (AudioListener audioListener : audioListenerList)
             audioListener.changeVolume(current_volume);
     }

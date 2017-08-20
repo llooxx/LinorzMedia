@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.linorz.linorzmedia.media.AudioPlay;
+import com.linorz.linorzmedia.mediatools.AudioPlay;
 import com.linorz.linorzmedia.main.adapter.PlayAudio;
 import com.linorz.linorzmedia.main.adapter.AudioAdapter;
 import com.linorz.linorzmedia.mediatools.Audio;
@@ -24,7 +24,7 @@ public class AudioFragment extends MediaFragment {
     private PlayAudio playAudio;
     public int last_num = 0;
     private AudioPlay audioPlay;
-
+    private boolean isAudiosExist = false;
     private Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message message) {
@@ -42,8 +42,13 @@ public class AudioFragment extends MediaFragment {
     });
 
     public AudioFragment() {
-        if (AudioPlay.instance == null)
+        if (AudioPlay.instance == null) {
             this.audioPlay = new AudioPlay();
+            isAudiosExist = false;
+        } else {
+            this.audioPlay = AudioPlay.instance;
+            isAudiosExist = true;
+        }
     }
 
     public AudioPlay getAudioPlay() {
@@ -65,8 +70,14 @@ public class AudioFragment extends MediaFragment {
 
     @Override
     protected RecyclerView.Adapter getAdapter() {
+        if (isAudiosExist)
+            audios = audioPlay.getAudios();
+        else
+            audios = (ArrayList<Audio>) new AudioProvider(context).getList();
+        //设置数组
+        audioPlay.setAudios(audios);
+
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        audios = (ArrayList<Audio>) new AudioProvider(context).getList();
         AudioAdapter audioAdapter = new AudioAdapter(context, items);
         audioAdapter.setPlayAudioListener(new PlayAudio() {
             @Override
@@ -97,7 +108,5 @@ public class AudioFragment extends MediaFragment {
             items.add(map);
         }
         adapter.notifyDataSetChanged();
-        //设置数组
-        audioPlay.setAudios(audios);
     }
 }

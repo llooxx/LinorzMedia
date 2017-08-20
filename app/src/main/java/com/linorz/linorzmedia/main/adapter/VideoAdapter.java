@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.linorz.linorzmedia.R;
-import com.linorz.linorzmedia.media.PlayActivity;
+import com.linorz.linorzmedia.main.activity.PlayActivity;
 import com.linorz.linorzmedia.tools.StaticMethod;
 
 /**

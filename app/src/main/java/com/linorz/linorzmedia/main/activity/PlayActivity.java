@@ -1,4 +1,4 @@
-package com.linorz.linorzmedia.media;
+package com.linorz.linorzmedia.main.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;

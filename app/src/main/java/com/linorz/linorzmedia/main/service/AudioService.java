@@ -17,7 +17,7 @@ import android.widget.Toast;
 
 import com.linorz.linorzmedia.R;
 import com.linorz.linorzmedia.main.activity.MainActivity;
-import com.linorz.linorzmedia.media.AudioPlay;
+import com.linorz.linorzmedia.mediatools.AudioPlay;
 import com.linorz.linorzmedia.mediatools.Audio;
 
 /**

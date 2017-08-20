@@ -24,7 +24,7 @@ import com.linorz.linorzmedia.R;
 import com.linorz.linorzmedia.customview.FloatingAction.FloatingActionMenu;
 import com.linorz.linorzmedia.customview.FloatingAction.animation.DefaultAnimationHandler;
 import com.linorz.linorzmedia.customview.ServiceFloatView;
-import com.linorz.linorzmedia.media.AudioPlay;
+import com.linorz.linorzmedia.mediatools.AudioPlay;
 import com.linorz.linorzmedia.tools.StaticMethod;
 
 public class LinorzService extends Service {

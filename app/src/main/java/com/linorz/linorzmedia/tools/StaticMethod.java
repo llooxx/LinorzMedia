@@ -1,5 +1,6 @@
 package com.linorz.linorzmedia.tools;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -203,6 +204,20 @@ public class StaticMethod {
             return permiList.toArray(new String[permiList.size()]);
         } else {
             return new String[]{};
+        }
+    }
+
+    public static void requestPermissions(Activity activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            String[] permissions = checkSelfPermissionArray(activity, new String[]{
+                    Manifest.permission.SYSTEM_ALERT_WINDOW,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.RECORD_AUDIO
+            });
+            if (permissions.length > 0) {
+                ActivityCompat.requestPermissions(activity, permissions, 1);
+            }
         }
     }
 
