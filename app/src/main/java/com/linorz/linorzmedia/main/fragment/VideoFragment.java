@@ -60,7 +60,7 @@ public class VideoFragment extends MediaFragment {
             public void run() {
                 for (int i = 0; i < videos.size(); i++) {
                     Map<String, Object> map = items.get(i);
-                    map.put("img", StaticMethod.createVideoThumbnail(videos.get(i).getPath()));
+                    map.put("img", videos.get(i).getVideoThumbnail());
                     if (recyclerView.getScrollState() != RecyclerView.SCROLL_STATE_IDLE
                             || (!recyclerView.isComputingLayout())) {
                         adapter.notifyItemChanged(i);

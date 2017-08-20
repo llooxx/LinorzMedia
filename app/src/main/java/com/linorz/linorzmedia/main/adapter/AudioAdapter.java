@@ -38,10 +38,13 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.AudioItem> {
         audioItem.time.setText((String) mapList.get(i).get("time"));
         audioItem.path = (String) mapList.get(i).get("path");
         audioItem.i = i;
-        if ((boolean) mapList.get(i).get("isPlay"))
-            audioItem.name.setTextColor(0xff436cf1);
-        else
+        if ((boolean) mapList.get(i).get("isPlay")) {
+            audioItem.view.setBackgroundResource(R.color.transparentBlue);
+            audioItem.name.setTextColor(0xffffffff);
+        } else {
+            audioItem.view.setBackgroundResource(R.color.transparent);
             audioItem.name.setTextColor(0xff696969);
+        }
     }
 
     @Override
@@ -56,10 +59,12 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.AudioItem> {
     public class AudioItem extends RecyclerView.ViewHolder {
         TextView name, time;
         String path;
+        View view;
         int i;
 
         public AudioItem(final View view) {
             super(view);
+            this.view = view;
             name = (TextView) view.findViewById(R.id.item_name);
             time = (TextView) view.findViewById(R.id.item_time);
             view.setOnClickListener(new View.OnClickListener() {

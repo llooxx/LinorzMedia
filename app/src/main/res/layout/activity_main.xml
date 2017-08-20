@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ffff"
     android:fitsSystemWindows="true"
     tools:context=".main.activity.MainActivity">
 
@@ -47,6 +46,7 @@
 
             <android.support.v4.view.ViewPager
                 android:id="@+id/viewpager"
+                android:background="@color/backgroundGray"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
         </FrameLayout>
@@ -56,7 +56,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
-            android:background="#deffffff"
+            android:background="@color/white"
             android:elevation="5dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
