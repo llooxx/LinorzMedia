@@ -96,14 +96,6 @@ public class MainActivity extends AppCompatActivity {
         });
         //音频播放工具获得
         audioPlay = AudioPlay.instance;
-        audioPlay.setAudioPlayAction(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-                //随机
-                audioPlay.current_num = (int) (audioPlay.getAudios().size() * Math.random());
-                audioPlay.setAudio(audioPlay.current_num, true);
-            }
-        });
         audioListener = new AudioPlay.AudioListener() {
             @Override
             public void start() {
@@ -119,6 +111,10 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void changeAudio(boolean play) {
+                //开启通知栏控制器
+                intent = new Intent(MainActivity.this, AudioService.class);
+                bindService(intent, mServiceConnection, BIND_AUTO_CREATE);
+
                 Audio audio = audioPlay.getCurrentAudio();
                 //跳转
                 audioFragment.jumpToPositon(audioPlay.current_num);
@@ -373,6 +369,11 @@ public class MainActivity extends AppCompatActivity {
                 Intent home = new Intent(Intent.ACTION_MAIN);
                 home.addCategory(Intent.CATEGORY_HOME);
                 startActivity(home);
+                break;
+            case R.id.setting:
+                //设置
+                intent = new Intent(this, SettingActivity.class);
+                startActivity(intent);
                 break;
             default:
                 break;

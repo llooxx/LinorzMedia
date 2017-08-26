@@ -6,6 +6,8 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.3'
+        //butterknife的新版插件必须在此处作配置
+        classpath 'com.jakewharton:butterknife-gradle-plugin:8.8.1'
     }
 }
 

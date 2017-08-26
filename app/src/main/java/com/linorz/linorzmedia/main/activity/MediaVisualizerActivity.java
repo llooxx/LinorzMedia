@@ -42,7 +42,7 @@ public class MediaVisualizerActivity extends SwipeBackActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.test);//将布局添加到 Activity
+        setContentView(R.layout.activity_visualizer);//将布局添加到 Activity
         initView();
 
         // 创建MediaPlayer对象,并添加音频

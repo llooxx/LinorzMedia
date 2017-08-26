@@ -9,8 +9,8 @@
     <color name="blue">#43a2f1</color>
     <color name="transparentBlue">#af43a2f1</color>
     <color name="textGray">#696969</color>
-    <color name="backgroundGray">#fefefe</color>
-    <color name="lineGray">#cccccc</color>
+    <color name="backgroundGray">#fffefefe</color>
+    <color name="lineGray">#ffcccccc</color>
     <color name="transparent">#00ffffff</color>
     <!--<color name="colorPrimary">#f78e3e</color>-->
     <!--<color name="colorPrimaryDark">#f9842b</color>-->

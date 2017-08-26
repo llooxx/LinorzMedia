@@ -16,6 +16,7 @@ import com.linorz.linorzmedia.main.application.LinorzApplication;
  */
 
 public class AudioPlay {
+    public final static int ORDER_MODE = 0, RANDOM_MODE = 1;
     public static AudioPlay instance;//单例
     private MediaPlayer mPlayer;
     private Audio current_audio;
@@ -23,8 +24,8 @@ public class AudioPlay {
     private SharedPreferences mySharedPreferences;
     private SharedPreferences.Editor editor;
     private Context context;
-    private MediaPlayer.OnCompletionListener onCompletionListener;
-    private float current_volume = 1.0f;
+    private float current_volume = 0.5f;
+    private int mode = 0;
     public int current_num = 0;
     //接口
     private ArrayList<AudioListener> audioListenerList;
@@ -37,6 +38,8 @@ public class AudioPlay {
         editor = mySharedPreferences.edit();
         instance = this;
         audioListenerList = new ArrayList<>();
+        current_volume = mySharedPreferences.getFloat("volume", 0.5f);
+        mode = mySharedPreferences.getInt("mode", ORDER_MODE);
     }
 
     //get
@@ -81,7 +84,7 @@ public class AudioPlay {
 
     public void init() {
         current_num = getLastAudioNum();
-        setAudio(getAudio(current_num), false);
+        setAudio(false);
     }
 
     public void start() {
@@ -125,8 +128,10 @@ public class AudioPlay {
             for (AudioListener audioListener : audioListenerList) audioListener.start();
         } else
             for (AudioListener audioListener : audioListenerList) audioListener.pause();
-        if (onCompletionListener != null)
-            mPlayer.setOnCompletionListener(onCompletionListener);
+        if (mode == ORDER_MODE)
+            mPlayer.setOnCompletionListener(orderListener);
+        else if (mode == RANDOM_MODE)
+            mPlayer.setOnCompletionListener(randomListener);
         for (AudioListener audioListener : audioListenerList) {
             audioListener.changeAudio(play);
             audioListener.changeVolume(current_volume);
@@ -139,6 +144,17 @@ public class AudioPlay {
         current_num = num;
         setAudio(audio, play);
         return true;
+    }
+
+    public void setAudio(boolean play) {
+        Audio audio = getAudio(current_num);
+        setAudio(audio, play);
+    }
+
+    public void setMode(int mode) {
+        if (mode > 1)
+            mode = 0;
+        this.mode = mode;
     }
 
     public void volumeUp() {
@@ -157,10 +173,6 @@ public class AudioPlay {
             audioListener.changeVolume(current_volume);
     }
 
-    public void setAudioPlayAction(MediaPlayer.OnCompletionListener ocl) {
-        this.onCompletionListener = ocl;
-    }
-
 
     public void addAudioListener(AudioListener audioListener) {
         audioListenerList.add(audioListener);
@@ -169,6 +181,24 @@ public class AudioPlay {
     public boolean removeAudioListener(AudioListener audioListener) {
         return audioListenerList.remove(audioListener);
     }
+
+    MediaPlayer.OnCompletionListener orderListener = new MediaPlayer.OnCompletionListener() {
+        @Override
+        public void onCompletion(MediaPlayer mediaPlayer) {
+            //顺序
+            if (++current_num >= audios.size())
+                current_num = 0;
+            setAudio(true);
+        }
+    };
+    MediaPlayer.OnCompletionListener randomListener = new MediaPlayer.OnCompletionListener() {
+        @Override
+        public void onCompletion(MediaPlayer mediaPlayer) {
+            //随机
+            current_num = (int) (audios.size() * Math.random());
+            setAudio(true);
+        }
+    };
 
     public interface AudioListener {
         void start();
