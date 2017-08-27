@@ -165,17 +165,11 @@ public class AudioService extends Service {
                     break;
                 case BUTTON_NEXT:
                     //下一个
-                    if (!audioPlay.setAudio(++audioPlay.current_num, true)) {
-                        audioPlay.current_num--;
-                        Toast.makeText(this, "后面没有歌啦", Toast.LENGTH_SHORT).show();
-                    }
+                    audioPlay.playNext();
                     break;
                 case BUTTON_PREV:
                     //前一个
-                    if (!audioPlay.setAudio(--audioPlay.current_num, true)) {
-                        audioPlay.current_num++;
-                        Toast.makeText(this, "后面没有歌啦", Toast.LENGTH_SHORT).show();
-                    }
+                    audioPlay.playPrevious();
                     break;
                 case BUTTON_UP:
                     //音量大

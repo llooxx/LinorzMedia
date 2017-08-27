@@ -14,6 +14,8 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.linorz.linorzmedia.R;
+
 /**
  * 根据Visualizer传来的数据动态绘制波形效果，分别为：
  * 块状波形、柱状波形、曲线波形
@@ -51,7 +53,7 @@ public class MyVisualizerView extends View {
         // 设置画笔的属性
         paint.setStrokeWidth(10f);
         paint.setAntiAlias(true);//抗锯齿
-        paint.setColor(Color.YELLOW);//画笔颜色
+        paint.setColor(getResources().getColor(R.color.blue, null));//画笔颜色
         paint.setStyle(Paint.Style.FILL);
     }
 
@@ -97,12 +99,13 @@ public class MyVisualizerView extends View {
                 break;
             // -------绘制柱状的波形图（每隔18个抽样点绘制一个矩形）-------
             case 1:
+                int w = (int) (getWidth() / (bytes.length / 18) / 1.5);
                 for (int i = 0; i < bytes.length - 1; i += 18) {
                     float left = rect.width() * i / (bytes.length - 1);
                     // 根据波形值计算该矩形的高度
                     float top = rect.height() - (byte) (bytes[i + 1] + 128)
                             * rect.height() / 128;
-                    float right = left + 6;
+                    float right = left + w;//宽度为w
                     float bottom = rect.height();
                     canvas.drawRect(left, top, right, bottom, paint);
                 }
@@ -118,15 +121,15 @@ public class MyVisualizerView extends View {
                     points[i * 4] = rect.width() * i / (bytes.length - 1);
                     // 根据bytes[i]的值（波形点的值）计算第i个点的y坐标
                     points[i * 4 + 1] = (rect.height() / 2)
-                            + ((byte) (bytes[i] + 128)) * 128
-                            / (rect.height() / 2);
+                            + (((byte) (bytes[i] + 128)) * 128
+                            / (rect.height() / 2)) * 10;//在原来基础上振幅扩大10倍
                     // 计算第i+1个点的x坐标
                     points[i * 4 + 2] = rect.width() * (i + 1)
                             / (bytes.length - 1);
                     // 根据bytes[i+1]的值（波形点的值）计算第i+1个点的y坐标
                     points[i * 4 + 3] = (rect.height() / 2)
-                            + ((byte) (bytes[i + 1] + 128)) * 128
-                            / (rect.height() / 2);
+                            + (((byte) (bytes[i + 1] + 128)) * 128
+                            / (rect.height() / 2)) * 10;//在原来基础上振幅扩大10倍
                 }
                 // 绘制波形曲线
                 canvas.drawLines(points, paint);

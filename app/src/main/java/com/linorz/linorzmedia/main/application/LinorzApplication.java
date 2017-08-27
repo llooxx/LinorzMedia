@@ -3,6 +3,7 @@ package com.linorz.linorzmedia.main.application;
 import android.app.Application;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.view.WindowManager;
 
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -20,6 +21,7 @@ public class LinorzApplication extends Application {
     private static LinorzApplication instance;
     private static DisplayImageOptions mOptions;
     private Context app_context;
+    public static int screenWidth, screenHeight;
 
     public static LinorzApplication getInstance() {
         return instance;
@@ -40,6 +42,8 @@ public class LinorzApplication extends Application {
         app_context = this.getApplicationContext();
         //初始化一些服务
         initImageLoader();
+        screenWidth = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getWidth();
+        screenHeight = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getHeight();
     }
 
     private void initImageLoader() {

@@ -125,7 +125,8 @@ public class SwipeBackLayout extends FrameLayout {
                 int moveX = (int) event.getRawX();
                 int deltaX = tempX - moveX;
                 tempX = moveX;
-                if (moveX - downX > mTouchSlop
+                //手指落下宽度判断
+                if (downX < viewWidth / 5 && moveX - downX > mTouchSlop
                         && Math.abs((int) event.getRawY() - downY) < mTouchSlop) {
                     isSilding = true;
                 }

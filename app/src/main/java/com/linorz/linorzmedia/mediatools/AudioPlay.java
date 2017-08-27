@@ -5,22 +5,28 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Stack;
 
 import com.linorz.linorzmedia.main.application.LinorzApplication;
+import com.linorz.linorzmedia.main.service.LinorzService;
 
 /**
  * Created by linorz on 2017/8/14.
  */
 
 public class AudioPlay {
-    public final static int ORDER_MODE = 0, RANDOM_MODE = 1;
+    public final static int ORDER_MODE = 0, RANDOM_MODE = 1, CIRCLE_MODE = 2;
     public static AudioPlay instance;//单例
     private MediaPlayer mPlayer;
     private Audio current_audio;
     private ArrayList<Audio> audios;
+    private Stack<Integer> history_audios = new Stack<>();
     private SharedPreferences mySharedPreferences;
     private SharedPreferences.Editor editor;
     private Context context;
@@ -101,6 +107,36 @@ public class AudioPlay {
         if (mPlayer != null) mPlayer.stop();
     }
 
+    public void playNext() {
+        switch (mode) {
+            case ORDER_MODE:
+                //顺序
+                if (++current_num >= audios.size())
+                    current_num = 0;
+                setAudio(true);
+                break;
+            case RANDOM_MODE:
+                //随机
+                current_num = (int) (audios.size() * Math.random());
+                setAudio(true);
+                break;
+            case CIRCLE_MODE:
+                //循环
+                setAudio(true);
+                break;
+        }
+    }
+
+    public void playPrevious() {
+        if (history_audios.size() == 1) {
+            Toast.makeText(LinorzApplication.getContext(), "已经到历史最前了", Toast.LENGTH_SHORT).show();
+        } else if (!history_audios.isEmpty()) {
+            history_audios.pop();
+            int last_num = history_audios.pop();
+            setAudio(last_num, true);
+        }
+    }
+
     //set
     public void setAudios(ArrayList<Audio> audios) {
         this.audios = audios;
@@ -108,6 +144,9 @@ public class AudioPlay {
 
     public void setAudio(Audio audio, boolean play) {
         current_audio = audio;
+        if (!(!history_audios.isEmpty() &&
+                history_audios.peek() == current_num))//循环播放不重复记录，注意不能简化写成并的形式
+            history_audios.push(current_num);
         editor.putString("lastAudioPath", current_audio.getPath());
         editor.putString("lastAudioAuthor", current_audio.getArtist());
         editor.putString("lastAudioTitle", current_audio.getTitle());
@@ -128,10 +167,7 @@ public class AudioPlay {
             for (AudioListener audioListener : audioListenerList) audioListener.start();
         } else
             for (AudioListener audioListener : audioListenerList) audioListener.pause();
-        if (mode == ORDER_MODE)
-            mPlayer.setOnCompletionListener(orderListener);
-        else if (mode == RANDOM_MODE)
-            mPlayer.setOnCompletionListener(randomListener);
+        mPlayer.setOnCompletionListener(completionListener);
         for (AudioListener audioListener : audioListenerList) {
             audioListener.changeAudio(play);
             audioListener.changeVolume(current_volume);
@@ -152,9 +188,18 @@ public class AudioPlay {
     }
 
     public void setMode(int mode) {
-        if (mode > 1)
-            mode = 0;
+        if (mode < 0) mode = 0;
+        else if (mode > 1) mode = 1;
         this.mode = mode;
+    }
+
+    public void setVolume(float volume) {
+        if (volume < 0f) volume = 0f;
+        else if (volume > 1f) volume = 1f;
+        this.current_volume = volume;
+        mPlayer.setVolume(current_volume, current_volume);
+        for (AudioListener audioListener : audioListenerList)
+            audioListener.changeVolume(current_volume);
     }
 
     public void volumeUp() {
@@ -182,21 +227,10 @@ public class AudioPlay {
         return audioListenerList.remove(audioListener);
     }
 
-    MediaPlayer.OnCompletionListener orderListener = new MediaPlayer.OnCompletionListener() {
+    MediaPlayer.OnCompletionListener completionListener = new MediaPlayer.OnCompletionListener() {
         @Override
         public void onCompletion(MediaPlayer mediaPlayer) {
-            //顺序
-            if (++current_num >= audios.size())
-                current_num = 0;
-            setAudio(true);
-        }
-    };
-    MediaPlayer.OnCompletionListener randomListener = new MediaPlayer.OnCompletionListener() {
-        @Override
-        public void onCompletion(MediaPlayer mediaPlayer) {
-            //随机
-            current_num = (int) (audios.size() * Math.random());
-            setAudio(true);
+            playNext();
         }
     };
 

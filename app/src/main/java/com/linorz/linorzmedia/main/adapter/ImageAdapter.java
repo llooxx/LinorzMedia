@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -29,7 +30,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageItem> {
     private LayoutInflater inflater;
     private List<Map<String, Object>> mapList;
     private BitmapFactory.Options options;
-    private int screenWidth;
+    private int default_width = 0;
     //    private int lastPosition = -1;
     private ArrayList<String> urls;
 
@@ -39,7 +40,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageItem> {
         this.mapList = mapList;
         options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
-        screenWidth = ((Activity) context).getWindowManager().getDefaultDisplay().getWidth();
+        default_width = (LinorzApplication.screenWidth - 30) / 3;
         this.urls = new ArrayList<>();
     }
 
@@ -69,7 +70,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageItem> {
 
     private void setWH(ImageView img, int ow, int oh) {
         ViewGroup.LayoutParams lp = img.getLayoutParams();
-        lp.width = StaticMethod.pxTodip(context, screenWidth - 30);
+        lp.width = default_width;
         lp.height = lp.width * oh / ow;
         img.setLayoutParams(lp);
     }

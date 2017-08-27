@@ -41,6 +41,7 @@ public class SettingActivity extends SwipeBackAppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 volume = i + 1;
+                AudioPlay.instance.setVolume(volume / 10);
                 volumeText.setText(String.valueOf(i + 1));
             }
 
@@ -59,12 +60,13 @@ public class SettingActivity extends SwipeBackAppCompatActivity {
     }
 
     private void setMode() {
-        modeBar.setMax(1);
+        modeBar.setMax(2);
         modeBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 if (i == 0) modeText.setText("顺序");
                 if (i == 1) modeText.setText("随机");
+                if (i == 2) modeText.setText("循环");
             }
 
             @Override
@@ -74,6 +76,7 @@ public class SettingActivity extends SwipeBackAppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                AudioPlay.instance.setMode(seekBar.getProgress());
                 editor.putInt("mode", seekBar.getProgress());
                 editor.apply();
             }

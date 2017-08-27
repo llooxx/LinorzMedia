@@ -167,16 +167,10 @@ public class LinorzService extends Service {
                     else audioPlay.start();
                 } else if (view == btns[0]) {
                     //下一个
-                    if (!audioPlay.setAudio(++audioPlay.current_num, true)) {
-                        audioPlay.current_num--;
-                        Toast.makeText(LinorzService.this, "后面没有歌啦", Toast.LENGTH_SHORT).show();
-                    }
+                    audioPlay.playNext();
                 } else if (view == btns[4]) {
                     //前一个
-                    if (!audioPlay.setAudio(--audioPlay.current_num, true)) {
-                        audioPlay.current_num++;
-                        Toast.makeText(LinorzService.this, "后面没有歌啦", Toast.LENGTH_SHORT).show();
-                    }
+                    audioPlay.playPrevious();
                 } else if (view == btns[2]) {
                     //回到顶端
                 } else if (view == btns[1]) {
