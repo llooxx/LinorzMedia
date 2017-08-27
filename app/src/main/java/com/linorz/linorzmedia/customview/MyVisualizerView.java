@@ -87,25 +87,26 @@ public class MyVisualizerView extends View {
         switch (type) {
             // -------绘制块状的波形图-------
             case 0:
+                float w = getWidth() / (bytes.length + 0.0f);
                 for (int i = 0; i < bytes.length - 1; i++) {
-                    float left = getWidth() * i / (bytes.length - 1);
+                    float left = getWidth() * i / (bytes.length - 1.0f);
                     // 根据波形值计算该矩形的高度
                     float top = rect.height() - (byte) (bytes[i + 1] + 128)
                             * rect.height() / 128;
-                    float right = left + 1;
+                    float right = left + w;
                     float bottom = rect.height();
                     canvas.drawRect(left, top, right, bottom, paint);
                 }
                 break;
             // -------绘制柱状的波形图（每隔18个抽样点绘制一个矩形）-------
             case 1:
-                int w = (int) (getWidth() / (bytes.length / 18) / 1.5);
+                float w2 = getWidth() / (bytes.length / 18) / 1.5f;
                 for (int i = 0; i < bytes.length - 1; i += 18) {
                     float left = rect.width() * i / (bytes.length - 1);
                     // 根据波形值计算该矩形的高度
                     float top = rect.height() - (byte) (bytes[i + 1] + 128)
                             * rect.height() / 128;
-                    float right = left + w;//宽度为w
+                    float right = left + w2;//宽度为w2
                     float bottom = rect.height();
                     canvas.drawRect(left, top, right, bottom, paint);
                 }
