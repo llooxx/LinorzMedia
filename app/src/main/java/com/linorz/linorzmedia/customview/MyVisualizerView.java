@@ -51,7 +51,7 @@ public class MyVisualizerView extends View {
     private void init() {
         bytes = null;
         // 设置画笔的属性
-        paint.setStrokeWidth(10f);
+        paint.setStrokeWidth(1f);
         paint.setAntiAlias(true);//抗锯齿
         paint.setColor(getResources().getColor(R.color.blue, null));//画笔颜色
         paint.setStyle(Paint.Style.FILL);

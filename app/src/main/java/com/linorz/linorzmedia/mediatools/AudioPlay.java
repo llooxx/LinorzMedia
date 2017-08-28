@@ -194,7 +194,7 @@ public class AudioPlay {
 
     public void setMode(int mode) {
         if (mode < 0) mode = 0;
-        else if (mode > 1) mode = 1;
+        else if (mode > 2) mode = 2;
         this.mode = mode;
     }
 
