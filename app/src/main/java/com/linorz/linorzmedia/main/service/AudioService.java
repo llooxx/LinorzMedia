@@ -160,8 +160,8 @@ public class AudioService extends Service {
         if (action.equals(ACTION_NOTIFICATION)) {
             switch (stringExtra) {
                 case BUTTON_PLAY:
-                    if (audioPlay.isPlaying()) audioPlay.pause();
-                    else audioPlay.start();
+                    //播放暂停
+                    audioPlay.changeState();
                     break;
                 case BUTTON_NEXT:
                     //下一个

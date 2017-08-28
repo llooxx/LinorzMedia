@@ -163,8 +163,7 @@ public class LinorzService extends Service {
             public void onClick(View view) {
                 if (view == btns[5]) {
                     //播放暂停
-                    if (audioPlay.isPlaying()) audioPlay.pause();
-                    else audioPlay.start();
+                    audioPlay.changeState();
                 } else if (view == btns[0]) {
                     //下一个
                     audioPlay.playNext();

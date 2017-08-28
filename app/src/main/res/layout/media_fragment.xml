@@ -2,6 +2,6 @@
 <com.linorz.linorzmedia.customview.LinorzRecyclerView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/recycler"
-    android:background="#bdf1f1f1"
+    android:background="@color/backgroundGray"
     android:layout_width="match_parent"
     android:layout_height="match_parent" />

@@ -103,6 +103,11 @@ public class AudioPlay {
         for (AudioListener audioListener : audioListenerList) audioListener.pause();
     }
 
+    public void changeState() {
+        if (isPlaying()) pause();
+        else start();
+    }
+
     public void stop() {
         if (mPlayer != null) mPlayer.stop();
     }

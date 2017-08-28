@@ -46,9 +46,9 @@
 
             <android.support.v4.view.ViewPager
                 android:id="@+id/viewpager"
-                android:background="@color/backgroundGray"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:background="@color/backgroundGray" />
         </FrameLayout>
 
         <LinearLayout
@@ -69,37 +69,24 @@
                 android:scaleType="centerCrop" />
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center_vertical"
                 android:orientation="vertical"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp">
 
-                <LinearLayout
+                <com.linorz.linorzmedia.customview.HorizontalScrollTextView
+                    android:id="@+id/main_audio_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <com.linorz.linorzmedia.customview.HorizontalScrollTextView
-                        android:id="@+id/main_audio_title"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:ellipsize="marquee"
-                        android:marqueeRepeatLimit="marquee_forever"
-                        android:singleLine="true"
-                        android:textColor="@color/black"
-                        android:textSize="16sp" />
-
-                    <TextView
-                        android:id="@+id/main_audio_state"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:lines="1"
-                        android:textColor="@color/transparentBlue"
-                        android:textSize="13sp" />
-                </LinearLayout>
+                    android:layout_weight="1"
+                    android:ellipsize="marquee"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    android:singleLine="true"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
 
                 <TextView
                     android:id="@+id/main_audio_author"
@@ -112,11 +99,38 @@
                     android:id="@+id/audio_seekbar"
                     style="@style/Widget.SeekBar.Normal"
                     android:layout_width="match_parent"
-                    android:layout_height="10dp"
+                    android:layout_height="4dp"
                     android:layout_marginTop="3dp"
                     android:paddingEnd="0dp"
                     android:paddingStart="0dp" />
             </LinearLayout>
+
+            <FrameLayout
+                android:layout_width="64dp"
+                android:layout_height="64dp">
+
+                <com.dinuscxj.progressbar.CircleProgressBar
+                    android:id="@+id/main_progress"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center"
+                    app:background_color="@color/transparent"
+                    app:draw_progress_text="false"
+                    app:progress_background_color="@color/backgroundGray"
+                    app:progress_end_color="@color/transparentBlue"
+                    app:progress_shader="radial"
+                    app:progress_start_color="@color/transparentBlue"
+                    app:progress_stroke_cap="butt"
+                    app:progress_stroke_width="5dp"
+                    app:style="solid_line" />
+
+                <ImageView
+                    android:id="@+id/main_audio_state"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/btn_start" />
+            </FrameLayout>
         </LinearLayout>
     </LinearLayout>
 

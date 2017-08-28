@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import com.dinuscxj.progressbar.CircleProgressBar;
 import com.linorz.linorzmedia.R;
 import com.linorz.linorzmedia.customview.FloatingAction.FloatingActionMenu;
 import com.linorz.linorzmedia.customview.FloatingAction.animation.DefaultAnimationHandler;
@@ -58,9 +59,10 @@ public class MainActivity extends AppCompatActivity {
     private VideoFragment videoFragment;
     private AudioFragment audioFragment;
     private ImageFragment imageFragment;
-    private TextView audio_title, audio_author, audio_state;
-    private ImageView play_btn;
+    private TextView audio_title, audio_author;
+    private ImageView play_btn, audio_state;
     private SeekBar audio_seekbar;
+    private CircleProgressBar circleProgressBar;
     private Timer t;//滑动条监听
     private TimerTask tt;//滑动条监听
     private RotateAnimation animation;//旋转动画
@@ -100,13 +102,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void start() {
                 play_btn.setImageResource(R.drawable.btn_pause_white);
-                audio_state.setText("正在播放");
+                audio_state.setImageResource(R.drawable.btn_pause);
             }
 
             @Override
             public void pause() {
                 play_btn.setImageResource(R.drawable.btn_play_white);
-                audio_state.setText("已暂停");
+                audio_state.setImageResource(R.drawable.btn_start);
             }
 
             @Override
@@ -122,10 +124,10 @@ public class MainActivity extends AppCompatActivity {
                 audio_title.setText(audio.getTitle());
                 audio_author.setText(audio.getArtist());
                 if (play) {
-                    audio_state.setText("正在播放");
+                    audio_state.setImageResource(R.drawable.btn_pause);
                     play_btn.setImageResource(R.drawable.btn_pause_white);
                 } else {
-                    audio_state.setText("已暂停");
+                    audio_state.setImageResource(R.drawable.btn_start);
                     play_btn.setImageResource(R.drawable.btn_play_white);
                 }
                 if (bitmap != null) bitmap.recycle();
@@ -162,8 +164,9 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         audio_title = (TextView) findViewById(R.id.main_audio_title);
         audio_author = (TextView) findViewById(R.id.main_audio_author);
-        audio_state = (TextView) findViewById(R.id.main_audio_state);
         audio_seekbar = (SeekBar) findViewById(R.id.audio_seekbar);
+        audio_state = (ImageView) findViewById(R.id.main_audio_state);
+        circleProgressBar = (CircleProgressBar) findViewById(R.id.main_progress);
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         viewPager.setPageTransformer(true, new MyPageTransformer());
         viewPager.setOffscreenPageLimit(2);
@@ -211,6 +214,12 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("path", "file://" + audio.getPath());
                 intent.putExtra("type", 2);
                 MainActivity.this.startActivity(intent);
+            }
+        });
+        audio_state.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                audioPlay.changeState();
             }
         });
     }
@@ -293,8 +302,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (view == btns[5]) {
                     //播放暂停
-                    if (audioPlay.isPlaying()) audioPlay.pause();
-                    else audioPlay.start();
+                    audioPlay.changeState();
                 } else if (view == btns[0]) {
                     //下一个
                     audioPlay.playNext();
@@ -320,19 +328,21 @@ public class MainActivity extends AppCompatActivity {
         if (t != null) t.cancel();
         if (tt != null) tt.cancel();
         audio_seekbar.setMax(audioPlay.getDuration());
+        circleProgressBar.setMax(audioPlay.getDuration());
         t = new Timer();
         tt = new TimerTask() {
             @Override
             public void run() {
                 try {
                     audio_seekbar.setProgress(audioPlay.getCurrentPosition());
+                    circleProgressBar.setProgress(audioPlay.getCurrentPosition());
                 } catch (Exception e) {
                     t.cancel();
                     tt.cancel();
                 }
             }
         };
-        t.schedule(tt, 0, 10);
+        t.schedule(tt, 0, 100);
     }
 
     @Override
