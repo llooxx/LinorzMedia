@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.linorz.linorzmedia.R;
+import com.linorz.linorzmedia.tools.MessageTools;
 
 /**
  * Created by linorz on 2016/5/5.
@@ -73,19 +74,16 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.AudioItem> {
                     if (playAudio != null) {
                         playAudio.playAudio(i);
                     }
+
                 }
             });
-//            final ImageView play = (ImageView) view.findViewById(R.id.item_play);
-//            View.OnClickListener onClickListener = new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    if (playAudio == null) return;
-//                    if (v == view) playAudio.playAudioTwo(i);
-//                    else if (v == play) playAudio.playAudio(i);
-//                }
-//            };
-//            view.setOnClickListener(onClickListener);
-//            play.setOnClickListener(onClickListener);
+            view.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    MessageTools.ToWebActivity(context,name.getText());
+                    return false;
+                }
+            });
         }
     }
 }

@@ -51,6 +51,7 @@ import com.linorz.linorzmedia.main.fragment.ImageFragment;
 import com.linorz.linorzmedia.main.fragment.MediaFragment;
 import com.linorz.linorzmedia.main.fragment.VideoFragment;
 import com.linorz.linorzmedia.mediatools.Audio;
+import com.linorz.linorzmedia.tools.MessageTools;
 import com.linorz.linorzmedia.tools.StaticMethod;
 
 public class MainActivity extends AppCompatActivity {
@@ -370,14 +371,14 @@ public class MainActivity extends AppCompatActivity {
                 intent = new Intent(this, LinorzService.class);
                 startService(intent);
                 //返回桌面
-                Intent home = new Intent(Intent.ACTION_MAIN);
-                home.addCategory(Intent.CATEGORY_HOME);
-                startActivity(home);
+                MessageTools.ToHome(this);
                 break;
             case R.id.setting:
                 //设置
-                intent = new Intent(this, SettingActivity.class);
-                startActivity(intent);
+                MessageTools.ToSettingActivity(this);
+                break;
+            case R.id.web_test:
+                MessageTools.ToWebActivity(this, null);
                 break;
             default:
                 break;

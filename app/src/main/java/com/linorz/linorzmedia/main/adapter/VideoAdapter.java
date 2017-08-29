@@ -15,6 +15,7 @@ import java.util.Map;
 
 import com.linorz.linorzmedia.R;
 import com.linorz.linorzmedia.main.activity.PlayActivity;
+import com.linorz.linorzmedia.tools.MessageTools;
 import com.linorz.linorzmedia.tools.StaticMethod;
 
 /**
@@ -72,11 +73,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoItem> {
                 @Override
                 public void onClick(View view) {
                     if (playAudio != null) playAudio.playAudio(0);
-                    Intent intent = new Intent(context, PlayActivity.class);
-                    intent.putExtra("path", path);
-                    intent.putExtra("type", 1);
-                    StaticMethod.currentDuration = -1;
-                    context.startActivity(intent);
+                    MessageTools.ToVideoActivity(context, path);
                 }
             });
         }

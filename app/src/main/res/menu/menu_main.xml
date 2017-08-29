@@ -22,4 +22,9 @@
         android:orderInCategory="100"
         android:title="设置"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/web_test"
+        android:orderInCategory="100"
+        android:title="网页测试"
+        app:showAsAction="never" />
 </menu>

@@ -74,6 +74,9 @@
         <activity
             android:name=".main.activity.SettingActivity"
             android:theme="@style/SwipeBackTheme" />
+        <activity
+            android:name=".main.activity.WebActivity"
+            android:theme="@style/SwipeBackTheme" />
 
         <service android:name=".main.service.LinorzService" />
         <service android:name=".main.service.AudioService" />
