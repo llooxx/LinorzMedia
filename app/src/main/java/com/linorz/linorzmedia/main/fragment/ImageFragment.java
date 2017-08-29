@@ -21,7 +21,7 @@ public class ImageFragment extends MediaFragment {
     protected RecyclerView.Adapter getAdapter() {
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL));
         images = (ArrayList<Image>) new ImageProvider(context).getList();
-        return new ImageAdapter(context, items);
+        return new ImageAdapter(this, items);
     }
 
     @Override

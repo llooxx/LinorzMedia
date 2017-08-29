@@ -1,9 +1,13 @@
 package com.linorz.linorzmedia.main.adapter;
 
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +31,7 @@ import com.linorz.linorzmedia.tools.StaticMethod;
  */
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageItem> {
     private Context context;
+    private Fragment fragment;
     private LayoutInflater inflater;
     private List<Map<String, Object>> mapList;
     private BitmapFactory.Options options;
@@ -34,8 +39,9 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageItem> {
     //    private int lastPosition = -1;
     private ArrayList<String> urls;
 
-    public ImageAdapter(Context context, List<Map<String, Object>> mapList) {
-        this.context = context;
+    public ImageAdapter(Fragment fragment, List<Map<String, Object>> mapList) {
+        this.fragment=fragment;
+        this.context = fragment.getContext();
         this.inflater = LayoutInflater.from(context);
         this.mapList = mapList;
         options = new BitmapFactory.Options();
@@ -91,9 +97,11 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageItem> {
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    ActivityOptionsCompat options = ActivityOptionsCompat
+                            .makeSceneTransitionAnimation(fragment.getActivity(), img, "image");
                     Intent intent = new Intent(context, ZoomImage.class);
                     intent.putExtra("path", path);
-                    context.startActivity(intent);
+                    ActivityCompat.startActivity(fragment.getActivity(), intent, options.toBundle());
                 }
             });
         }
