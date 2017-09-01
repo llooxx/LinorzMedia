@@ -19,6 +19,12 @@ public class MessageTools {
         context.startActivity(intent);
     }
 
+    public static void ToWebActivityURL(Context context, String url) {
+        Intent intent = new Intent(context, WebActivity.class);
+        intent.putExtra("url", url);
+        context.startActivity(intent);
+    }
+
     public static void ToHome(Context context) {
         Intent home = new Intent(Intent.ACTION_MAIN);
         home.addCategory(Intent.CATEGORY_HOME);
@@ -30,7 +36,7 @@ public class MessageTools {
         context.startActivity(intent);
     }
 
-    public static void ToVideoActivity(Context context,String path) {
+    public static void ToVideoActivity(Context context, String path) {
         Intent intent = new Intent(context, PlayActivity.class);
         intent.putExtra("path", path);
         intent.putExtra("type", 1);

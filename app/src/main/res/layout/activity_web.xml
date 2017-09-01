@@ -33,6 +33,7 @@
                     android:layout_gravity="right|center_vertical"
                     android:layout_marginRight="16dp"
                     android:max="100"
+                    app:draw_progress_text="false"
                     app:background_color="@color/transparent"
                     app:progress_background_color="@color/backgroundGray"
                     app:progress_end_color="@color/transparentBlue"
@@ -40,9 +41,6 @@
                     app:progress_start_color="@color/transparentBlue"
                     app:progress_stroke_cap="butt"
                     app:progress_stroke_width="5dp"
-                    app:progress_text_color="@color/white"
-                    app:progress_text_format_pattern="0"
-                    app:progress_text_size="10sp"
                     app:style="solid_line" />
             </android.support.v7.widget.Toolbar>
 

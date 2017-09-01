@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -23,6 +24,12 @@ import android.webkit.WebViewClient;
 
 import com.dinuscxj.progressbar.CircleProgressBar;
 import com.linorz.linorzmedia.R;
+import com.linorz.linorzmedia.main.application.LinorzApplication;
+import com.linorz.linorzmedia.main.fragment.WebFragment;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -32,7 +39,8 @@ public class WebActivity extends SwipeBackAppCompatActivity {
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor editor;
     private WebSettings mWebSettings;
-    private String search_content;
+    private String search_content, url;
+    private JSONArray lovelist;
     @BindView(R.id.web_webview)
     WebView mWebView;
     @BindView(R.id.toolbar)
@@ -52,6 +60,7 @@ public class WebActivity extends SwipeBackAppCompatActivity {
         ButterKnife.bind(this);
         Intent intent = getIntent();
         search_content = intent.getStringExtra("search_content");
+        url = intent.getStringExtra("url");
         mToolbar.setTitle(search_content);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -62,16 +71,21 @@ public class WebActivity extends SwipeBackAppCompatActivity {
         initView();
         setWebSettings();
 
-        switch (mSharedPreferences.getInt("search", 0)) {
-            case 0:
-                //百度
-                mWebView.loadUrl("https://m.baidu.com" + (search_content == null ? "" : "/s?word=" + search_content));//https://m.baidu.com/s?word=2333+666
-                break;
-            case 1:
-                //必应
-                mWebView.loadUrl("http://www.bing.com" + (search_content == null ? "" : "/search?q=" + search_content));
-                break;
-        }
+        lovelist = LinorzApplication.lovelist;
+
+        if (url != null)
+            mWebView.loadUrl(url);
+        else
+            switch (mSharedPreferences.getInt("search", 0)) {
+                case 0:
+                    //百度
+                    mWebView.loadUrl("https://m.baidu.com" + (search_content == null ? "" : "/s?word=" + search_content));//https://m.baidu.com/s?word=2333+666
+                    break;
+                case 1:
+                    //必应
+                    mWebView.loadUrl("http://www.bing.com" + (search_content == null ? "" : "/search?q=" + search_content));
+                    break;
+            }
 
         //设置不用系统浏览器打开,直接显示在当前Webview
         mWebView.setWebViewClient(new WebViewClient() {
@@ -84,6 +98,17 @@ public class WebActivity extends SwipeBackAppCompatActivity {
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
                 mWebAppBar.setExpanded(true, true);
+                try {
+                    boolean f = false;
+                    for (int i = 0; i < lovelist.length(); i++) {
+                        String u = lovelist.getJSONObject(i).getString("url");
+                        if (url.equals(u)) f = true;
+                    }
+                    if (f) mWebProgress.setBackgroundColor(Color.RED);
+                    else mWebProgress.setBackgroundColor(0x00000000);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -106,11 +131,10 @@ public class WebActivity extends SwipeBackAppCompatActivity {
             //获取加载进度
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
-                String progress = newProgress + "";
-                mWebProgress.setProgressTextFormatPattern(progress);
                 mWebProgress.setProgress(newProgress);
             }
         });
+
     }
 
     private void initView() {
@@ -152,6 +176,23 @@ public class WebActivity extends SwipeBackAppCompatActivity {
         });
         //进度条
         mWebProgress.setMax(100);
+        mWebProgress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mWebProgress.setBackgroundColor(Color.RED);
+                JSONObject jo = new JSONObject();
+                try {
+                    jo.put("url", mWebView.getUrl());
+                    jo.put("name", mWebView.getTitle());
+                    lovelist.put(jo);
+                    editor.putString("lovelist", lovelist.toString());
+                    editor.apply();
+                    WebFragment.updateDate();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     private void setWebSettings() {
