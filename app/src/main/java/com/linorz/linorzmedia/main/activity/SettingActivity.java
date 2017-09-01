@@ -31,6 +31,7 @@ public class SettingActivity extends SwipeBackAppCompatActivity {
 
         setVolume();
         setMode();
+        setSearch();
     }
 
     private void setVolume() {
@@ -84,6 +85,30 @@ public class SettingActivity extends SwipeBackAppCompatActivity {
         modeBar.setProgress(mSharedPreferences.getInt("mode", AudioPlay.ORDER_MODE));
     }
 
+    private void setSearch() {
+        searchBar.setMax(1);
+        searchBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                if (i == 0) searchTv.setText("百度");
+                if (i == 1) searchTv.setText("必应");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                AudioPlay.instance.setMode(seekBar.getProgress());
+                editor.putInt("search", seekBar.getProgress());
+                editor.apply();
+            }
+        });
+        searchBar.setProgress(mSharedPreferences.getInt("search", 0));
+    }
+
     @BindView(R.id.setting_volume_bar)
     SeekBar volumeBar;
     @BindView(R.id.setting_volume_tv)
@@ -92,4 +117,8 @@ public class SettingActivity extends SwipeBackAppCompatActivity {
     SeekBar modeBar;
     @BindView(R.id.setting_mode_tv)
     TextView modeText;
+    @BindView(R.id.setting_search_bar)
+    SeekBar searchBar;
+    @BindView(R.id.setting_search_tv)
+    TextView searchTv;
 }
