@@ -45,8 +45,6 @@ public class WebActivity extends SwipeBackAppCompatActivity {
     WebView mWebView;
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
-    @BindView(R.id.web_swipe)
-    SwipeRefreshLayout mSwipe;
     @BindView(R.id.web_progress)
     CircleProgressBar mWebProgress;
     @BindView(R.id.web_appbar)
@@ -138,35 +136,6 @@ public class WebActivity extends SwipeBackAppCompatActivity {
     }
 
     private void initView() {
-        //刷新
-        mSwipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                mWebView.reload();  //刷新
-                mSwipe.setRefreshing(false);
-            }
-        });
-        //设置样式刷新显示的位置
-        mSwipe.setProgressViewOffset(true, -20, 200);
-        mSwipe.setColorSchemeResources(R.color.colorAccent, R.color.colorPrimary);
-        mWebView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
-            @Override
-            public void onScrollChange(View view, int i, int i1, int i2, int i3) {
-                if (mWebView.getScrollY() == 0) {
-                    mSwipe.setEnabled(true);
-                } else {
-                    mSwipe.setEnabled(false);
-                }
-            }
-        });
-        mWebAppBar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                if (verticalOffset >= 0) mSwipe.setEnabled(true);
-                else mSwipe.setEnabled(false);
-
-            }
-        });
         //处理点击
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -191,6 +160,13 @@ public class WebActivity extends SwipeBackAppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+            }
+        });
+        mToolbar.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                mWebView.reload();
+                return false;
             }
         });
     }

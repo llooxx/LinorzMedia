@@ -186,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
         list_title.add("video");
         list_title.add("audio");
         list_title.add("image");
-        list_title.add("web");
+        list_title.add("myweb");
         PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager(), list, list_title);
         viewPager.setAdapter(pagerAdapter);
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tablayout);
