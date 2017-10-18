@@ -16,9 +16,13 @@ import android.media.AudioManager;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
+import android.os.StatFs;
+import android.os.storage.StorageManager;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.View;
 
 import java.io.File;
@@ -267,5 +271,35 @@ public class StaticMethod {
         ActivityManager mActivityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningTaskInfo> rti = mActivityManager.getRunningTasks(1);
         return getHomes(context).contains(rti.get(0).topActivity.getPackageName());
+    }
+
+    //获取所有存储卡目录
+    public static String[] getSDPath(Context context) {
+        ArrayList<String> pathsList = new ArrayList<>();
+        StorageManager storageManager = (StorageManager) context.getSystemService(Context.STORAGE_SERVICE);
+        try {
+            Method method = StorageManager.class.getDeclaredMethod("getVolumePaths");
+            method.setAccessible(true);
+            Object result = method.invoke(storageManager);
+            if (result != null && result instanceof String[]) {
+                String[] pathes = (String[]) result;
+                StatFs statFs;
+                for (String path : pathes) {
+                    if (!TextUtils.isEmpty(path) && new File(path).exists()) {
+                        statFs = new StatFs(path);
+                        if (statFs.getBlockCount() * statFs.getBlockSize() != 0) {
+                            pathsList.add(path);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            File externalFolder = Environment.getExternalStorageDirectory();
+            if (externalFolder != null) {
+                pathsList.add(externalFolder.getAbsolutePath());
+            }
+        }
+        return pathsList.toArray(new String[pathsList.size()]);
     }
 }

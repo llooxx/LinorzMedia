@@ -46,11 +46,14 @@ public class AudioPlay {
         audioListenerList = new ArrayList<>();
         current_volume = mySharedPreferences.getFloat("volume", 0.5f);
         mode = mySharedPreferences.getInt("mode", ORDER_MODE);
+        audios = (ArrayList<Audio>) new AudioProvider(context).getList();
+        current_audio = audios.get(0);
     }
 
     //get
     public int getLastAudioNum() {
-        return mySharedPreferences.getInt("lastAudioNum", 0);
+        return mySharedPreferences.getInt("lastAudioNum", 0) >= audios.size() ?
+                audios.size() - 1 : mySharedPreferences.getInt("lastAudioNum", 0);
     }
 
     public Audio getAudio(int i) {

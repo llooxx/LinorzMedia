@@ -20,11 +20,9 @@ import com.linorz.linorzmedia.tools.StaticMethod;
  * Created by linorz on 2016/5/5.
  */
 public class AudioFragment extends MediaFragment {
-    public ArrayList<Audio> audios;
     private PlayAudio playAudio;
     public int last_num = 0;
     private AudioPlay audioPlay;
-    private boolean isAudiosExist = false;
     private Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message message) {
@@ -44,10 +42,8 @@ public class AudioFragment extends MediaFragment {
     public AudioFragment() {
         if (AudioPlay.instance == null) {
             this.audioPlay = new AudioPlay();
-            isAudiosExist = false;
         } else {
             this.audioPlay = AudioPlay.instance;
-            isAudiosExist = true;
         }
     }
 
@@ -70,13 +66,6 @@ public class AudioFragment extends MediaFragment {
 
     @Override
     protected RecyclerView.Adapter getAdapter() {
-        if (isAudiosExist)
-            audios = audioPlay.getAudios();
-        else
-            audios = (ArrayList<Audio>) new AudioProvider(context).getList();
-        //设置数组
-        audioPlay.setAudios(audios);
-
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         AudioAdapter audioAdapter = new AudioAdapter(context, items);
         audioAdapter.setPlayAudioListener(new PlayAudio() {
@@ -99,6 +88,7 @@ public class AudioFragment extends MediaFragment {
 
     @Override
     protected void load() {
+        ArrayList<Audio> audios = AudioPlay.instance.getAudios();
         for (int i = 0; i < audios.size(); i++) {
             Map<String, Object> map = new HashMap<>();
             map.put("name", audios.get(i).getTitle());
