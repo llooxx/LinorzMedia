@@ -8,6 +8,8 @@ import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 
 
+import com.linorz.linorzmedia.tools.mp3.MP3File;
+
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 
@@ -84,6 +86,12 @@ public class Audio extends Media {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+
+
+        byte[] image;
+        if (bm == null && (image = new MP3File(getPath(), true).getImageData()) != null)
+            bm = BitmapFactory.decodeByteArray(image, 0, image.length);
+
         return bm;
     }
 }

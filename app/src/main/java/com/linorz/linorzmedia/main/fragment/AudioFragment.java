@@ -92,7 +92,7 @@ public class AudioFragment extends MediaFragment {
         for (int i = 0; i < audios.size(); i++) {
             Map<String, Object> map = new HashMap<>();
             map.put("name", audios.get(i).getTitle());
-            map.put("time", StaticMethod.getMusicTime(audios.get(i).getDuration()));
+            map.put("artist",audios.get(i).getArtist());
             map.put("path", "file://" + audios.get(i).getPath());
             map.put("isPlay", false);
             items.add(map);

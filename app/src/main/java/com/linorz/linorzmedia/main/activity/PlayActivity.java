@@ -209,7 +209,6 @@ public class PlayActivity extends Activity {
                 }
             });
         }
-        System.out.println("!!!!!2:" + StaticMethod.currentDuration);
         if (StaticMethod.currentDuration != -1) {
             mediaPlayer.seekTo(StaticMethod.currentDuration);
             StaticMethod.currentDuration = -1;
@@ -314,7 +313,6 @@ public class PlayActivity extends Activity {
                     case R.id.change_screen_btn:
                         //横竖屏切换
                         StaticMethod.currentDuration = seekBar.getProgress();
-                        System.out.println("!!!!!1:" + StaticMethod.currentDuration);
                         t.cancel();
                         tt.cancel();
                         if (StaticMethod.mScreen)

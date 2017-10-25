@@ -52,6 +52,7 @@ import com.linorz.linorzmedia.main.fragment.ImageFragment;
 import com.linorz.linorzmedia.main.fragment.MediaFragment;
 import com.linorz.linorzmedia.main.fragment.VideoFragment;
 import com.linorz.linorzmedia.mediatools.Audio;
+import com.linorz.linorzmedia.mediatools.AudioProvider;
 import com.linorz.linorzmedia.tools.MessageTools;
 import com.linorz.linorzmedia.tools.StaticMethod;
 
@@ -384,6 +385,14 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.web_test:
                 MessageTools.ToWebActivity(this, null);
+                break;
+            case R.id.scanMP3:
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        AudioProvider.ScanSDCard();
+                    }
+                }).start();
                 break;
             default:
                 break;

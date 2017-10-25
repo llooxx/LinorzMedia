@@ -27,4 +27,9 @@
         android:orderInCategory="100"
         android:title="网页"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/scanMP3"
+        android:orderInCategory="100"
+        android:title="扫描"
+        app:showAsAction="never" />
 </menu>

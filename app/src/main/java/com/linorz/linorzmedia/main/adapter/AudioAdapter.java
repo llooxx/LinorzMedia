@@ -36,7 +36,7 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.AudioItem> {
     @Override
     public void onBindViewHolder(AudioItem audioItem, int i) {
         audioItem.name.setText((String) mapList.get(i).get("name"));
-        audioItem.time.setText((String) mapList.get(i).get("time"));
+        audioItem.artist.setText((String) mapList.get(i).get("artist"));
         audioItem.path = (String) mapList.get(i).get("path");
         audioItem.i = i;
         if ((boolean) mapList.get(i).get("isPlay")) {
@@ -58,7 +58,7 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.AudioItem> {
     }
 
     public class AudioItem extends RecyclerView.ViewHolder {
-        TextView name, time;
+        TextView name,artist;
         String path;
         View view;
         int i;
@@ -67,7 +67,7 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.AudioItem> {
             super(view);
             this.view = view;
             name = (TextView) view.findViewById(R.id.item_name);
-            time = (TextView) view.findViewById(R.id.item_time);
+            artist = (TextView) view.findViewById(R.id.item_artist);
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

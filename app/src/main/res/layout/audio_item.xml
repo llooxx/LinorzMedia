@@ -22,10 +22,13 @@
             android:textSize="16sp" />
 
         <TextView
-            android:id="@+id/item_time"
-            android:layout_width="wrap_content"
+            android:id="@+id/item_artist"
+            android:layout_width="64dp"
             android:layout_height="wrap_content"
-            android:text="时长" />
+            android:gravity="right"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="作者" />
 
     </LinearLayout>
 

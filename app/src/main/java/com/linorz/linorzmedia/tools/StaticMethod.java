@@ -25,6 +25,8 @@ import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.View;
 
+import com.linorz.linorzmedia.main.application.LinorzApplication;
+
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -274,9 +276,10 @@ public class StaticMethod {
     }
 
     //获取所有存储卡目录
-    public static String[] getSDPath(Context context) {
+    public static String[] getSDPath() {
         ArrayList<String> pathsList = new ArrayList<>();
-        StorageManager storageManager = (StorageManager) context.getSystemService(Context.STORAGE_SERVICE);
+        StorageManager storageManager = (StorageManager)
+                LinorzApplication.getContext().getSystemService(Context.STORAGE_SERVICE);
         try {
             Method method = StorageManager.class.getDeclaredMethod("getVolumePaths");
             method.setAccessible(true);
