@@ -9,7 +9,10 @@
         android:background="?android:attr/selectableItemBackground"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="20dp">
+        android:paddingBottom="20dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="10dp"
+        android:paddingTop="20dp">
 
         <TextView
             android:id="@+id/item_name"
@@ -23,10 +26,10 @@
 
         <TextView
             android:id="@+id/item_artist"
-            android:layout_width="64dp"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:gravity="right"
             android:ellipsize="end"
+            android:gravity="right"
             android:maxLines="1"
             android:text="作者" />
 

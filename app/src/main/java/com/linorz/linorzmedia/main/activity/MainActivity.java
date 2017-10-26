@@ -153,8 +153,7 @@ public class MainActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             public void run() {
                 initFab();//开线程时，已经绘制完成，能获得view的宽高
-                audioPlay.current_num = audioPlay.getLastAudioNum();
-                audioPlay.setAudio(audioPlay.current_num, false);
+                audioPlay.init();
 
                 //开启通知栏控制器
                 intent = new Intent(MainActivity.this, AudioService.class);

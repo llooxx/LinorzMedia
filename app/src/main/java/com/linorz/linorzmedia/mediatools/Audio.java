@@ -6,14 +6,16 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
+import android.support.annotation.NonNull;
 
 
 import com.linorz.linorzmedia.tools.mp3.MP3File;
 
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
+import java.util.Comparator;
 
-public class Audio extends Media {
+public class Audio extends Media implements Comparator<Audio> {
     private static final Uri albumArtUri = Uri.parse("content://media/external/audio/albumart");
     //音频类继承媒体类
     protected String album;//唱片
@@ -93,5 +95,10 @@ public class Audio extends Media {
             bm = BitmapFactory.decodeByteArray(image, 0, image.length);
 
         return bm;
+    }
+
+    @Override
+    public int compare(Audio audio, Audio t1) {
+        return audio.title.compareTo(t1.title);
     }
 }

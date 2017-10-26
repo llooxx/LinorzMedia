@@ -26,6 +26,7 @@ public class AudioPlay {
     private MediaPlayer mPlayer;
     private Audio current_audio;
     private ArrayList<Audio> audios;
+    private int[] random_audios;
     private Stack<Integer> history_audios = new Stack<>();
     private SharedPreferences mySharedPreferences;
     private SharedPreferences.Editor editor;
@@ -33,6 +34,7 @@ public class AudioPlay {
     private float current_volume = 0.5f;
     private int mode = 0;
     public int current_num = 0;
+    private int random_current_audios = 0;
     //接口
     private ArrayList<AudioListener> audioListenerList;
 
@@ -42,12 +44,50 @@ public class AudioPlay {
         //缓存
         mySharedPreferences = context.getSharedPreferences("LinorzMedia", Context.MODE_PRIVATE);
         editor = mySharedPreferences.edit();
+
         instance = this;
         audioListenerList = new ArrayList<>();
         current_volume = mySharedPreferences.getFloat("volume", 0.5f);
         mode = mySharedPreferences.getInt("mode", ORDER_MODE);
         audios = (ArrayList<Audio>) new AudioProvider(context).getList();
         current_audio = audios.get(0);
+
+        String[] random_audios_str = mySharedPreferences.getString("randomAudios", "").split(",");
+        if (random_audios_str.length != audios.size()) {
+            creatRandomArray();
+            random_current_audios = 0;
+        } else {
+            int last_num = getLastAudioNum();
+            random_audios = new int[random_audios_str.length];
+            for (int i = 0; i < random_audios_str.length; i++) {
+                random_audios[i] = Integer.parseInt(random_audios_str[i]);
+                if (random_audios[i] == last_num)
+                    random_current_audios = last_num;
+            }
+        }
+
+    }
+
+    //生成随机数组
+    private void creatRandomArray() {
+        int size = audios.size(), t;
+        random_audios = new int[size];
+        for (int i = 0; i < size; random_audios[i] = i++) ;
+        for (int i = 0; i < size; i++) {
+            int a = (int) (Math.random() * (size - 1));
+            int b = (int) (Math.random() * (size - 1));
+            t = random_audios[a];
+            random_audios[a] = random_audios[b];
+            random_audios[b] = t;
+        }
+        random_current_audios = 0;
+
+        //保存
+        String random_str = "";
+        for (int i = 0; i < size - 1; random_str += random_audios[i] + ",", i++) ;
+        random_str += random_audios[size - 1];
+        editor.putString("randomAudios", random_str);
+        editor.apply();
     }
 
     //get
@@ -92,7 +132,7 @@ public class AudioPlay {
     }
 
     public void init() {
-        current_num = getLastAudioNum();
+        current_num = random_current_audios;
         setAudio(false);
     }
 
@@ -125,7 +165,9 @@ public class AudioPlay {
                 break;
             case RANDOM_MODE:
                 //随机
-                current_num = (int) (audios.size() * Math.random());
+                if (++random_current_audios == audios.size())
+                    creatRandomArray();
+                current_num = random_audios[random_current_audios];
                 setAudio(true);
                 break;
             case CIRCLE_MODE:

@@ -1,33 +1,20 @@
 package com.linorz.linorzmedia.mediatools;
 
 import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-
-import android.content.ContentResolver;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.net.Uri;
-import android.os.Environment;
-import android.os.StatFs;
-import android.os.storage.StorageManager;
 import android.provider.MediaStore;
-import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.linorz.linorzmedia.main.application.LinorzApplication;
 import com.linorz.linorzmedia.tools.StaticMethod;
@@ -89,7 +76,7 @@ public class AudioProvider extends AbstractProvider {
             Audio audio = gson.fromJson(ja.get(i), Audio.class);
             list.add(audio);
         }
-//        list.addAll(ScanSDCard(context));
+
         return list;
     }
 
